@@ -55,10 +55,11 @@
 <main>
 
 <!-- ============================= HERO ============================= -->
-<section class="hero"
+
+ <section class="hero"
   style="
     position: relative;
-    min-height: 720px;
+    min-height: 660px;
     background-image: url('Astrantiadebut.jpeg');
     background-size: cover;
     background-position: center center;
@@ -66,23 +67,37 @@
     overflow: hidden;
   ">
 
-  <!-- Voile clair pour rendre le texte foncé lisible -->
+  <!-- FILTRE DE LISIBILITÉ -->
   <span
-    class="hero__veil"
     aria-hidden="true"
     style="
       position: absolute;
       inset: 0;
       z-index: 1;
-      background: linear-gradient(
-        90deg,
-        rgba(255,255,255,0.60) 0%,
-        rgba(255,255,255,0.38) 45%,
-        rgba(255,255,255,0.15) 100%
-      );
+      background:
+        linear-gradient(
+          90deg,
+          rgba(250,248,243,0.92) 0%,
+          rgba(250,248,243,0.82) 25%,
+          rgba(250,248,243,0.62) 45%,
+          rgba(250,248,243,0.30) 68%,
+          rgba(250,248,243,0.08) 100%
+        );
     ">
   </span>
 
+  <!-- FILTRE LÉGÈREMENT PLUS SOMBRE SUR L'ENSEMBLE DE L'IMAGE -->
+  <span
+    aria-hidden="true"
+    style="
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: rgba(20,20,18,0.08);
+    ">
+  </span>
+
+  <!-- CONTENU -->
   <div
     class="container hero__inner"
     style="
@@ -90,43 +105,99 @@
       z-index: 2;
     ">
 
-    <div class="hero__content">
+    <div
+      class="hero__content"
+      style="
+        max-width: 720px;
+        text-shadow: 0 2px 10px rgba(255,255,255,0.45);
+      ">
 
-      <span class="eyebrow reveal">
+      <span
+        class="eyebrow reveal"
+        style="
+          color: #252522;
+          font-weight: 600;
+          text-shadow: 0 1px 5px rgba(255,255,255,0.8);
+        ">
         Maison fondée à Attignat — depuis 2019
       </span>
 
-      <h1 class="reveal" data-delay="1">
+      <h1
+        class="reveal"
+        data-delay="1"
+        style="
+          color: #11110f;
+          text-shadow:
+            0 2px 8px rgba(255,255,255,0.75),
+            0 1px 2px rgba(255,255,255,0.9);
+        ">
         <span class="hero__word">Astrantia</span>
       </h1>
 
-      <p class="hero__tagline reveal" data-delay="2">
+      <p
+        class="hero__tagline reveal"
+        data-delay="2"
+        style="
+          color: #171714;
+          text-shadow:
+            0 2px 8px rgba(255,255,255,0.9),
+            0 1px 2px rgba(255,255,255,0.9);
+        ">
         L'élégance au cœur de votre intérieur/extérieur.
       </p>
 
-      <p class="hero__sub reveal" data-delay="3">
+      <p
+        class="hero__sub reveal"
+        data-delay="3"
+        style="
+          color: #22221f;
+          max-width: 620px;
+          font-weight: 500;
+          text-shadow:
+            0 2px 7px rgba(255,255,255,0.95),
+            0 1px 2px rgba(255,255,255,0.95);
+        ">
         Mobilier et objets d'exception pensés pour créer des espaces uniques :
         matières nobles, lignes justes, fabrication européenne.
       </p>
 
-      <div class="hero__actions reveal" data-delay="4">
-        <a class="btn btn--solid" href="collections.html">
+      <div
+        class="hero__actions reveal"
+        data-delay="4"
+        style="
+          position: relative;
+          z-index: 3;
+        ">
+
+        <a
+          class="btn btn--solid"
+          href="collections.html">
           Découvrir la collection
         </a>
 
-        <a class="btn" href="boutique.html">
+        <a
+          class="btn"
+          href="boutique.html">
           Explorer la boutique
         </a>
+
       </div>
 
     </div>
   </div>
 
+  <!-- INFORMATIONS EN BAS À DROITE -->
   <p
     class="hero__meta"
     style="
-      position: relative;
+      position: absolute;
+      right: 40px;
+      bottom: 35px;
       z-index: 2;
+      color: #22221f;
+      font-weight: 600;
+      text-shadow:
+        0 2px 8px rgba(255,255,255,0.9);
     ">
     <span data-total-products>136</span>
     références · Livraison &amp; installation en Europe
