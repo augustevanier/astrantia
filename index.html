@@ -55,22 +55,83 @@
 <main>
 
 <!-- ============================= HERO ============================= -->
-<section class="hero">
-<img src="Astrantiadebut.jpeg"
-  <span class="hero__veil" aria-hidden="true"></span>
-  <div class="container hero__inner">
+<section class="hero"
+  style="
+    position: relative;
+    min-height: 720px;
+    background-image: url('Astrantiadebut.jpeg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  ">
+
+  <!-- Voile clair pour rendre le texte foncé lisible -->
+  <span
+    class="hero__veil"
+    aria-hidden="true"
+    style="
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.60) 0%,
+        rgba(255,255,255,0.38) 45%,
+        rgba(255,255,255,0.15) 100%
+      );
+    ">
+  </span>
+
+  <div
+    class="container hero__inner"
+    style="
+      position: relative;
+      z-index: 2;
+    ">
+
     <div class="hero__content">
-      <span class="eyebrow reveal">Maison fondée à Attignat — depuis 2019</span>
-      <h1 class="reveal" data-delay="1"><span class="hero__word">Astrantia</span></h1>
-      <p class="hero__tagline reveal" data-delay="2">L'élégance au cœur de votre intérieur/extérieur.</p>
-      <p class="hero__sub reveal" data-delay="3">Mobilier et objets d'exception pensés pour créer des espaces uniques : matières nobles, lignes justes, fabrication européenne.</p>
+
+      <span class="eyebrow reveal">
+        Maison fondée à Attignat — depuis 2019
+      </span>
+
+      <h1 class="reveal" data-delay="1">
+        <span class="hero__word">Astrantia</span>
+      </h1>
+
+      <p class="hero__tagline reveal" data-delay="2">
+        L'élégance au cœur de votre intérieur/extérieur.
+      </p>
+
+      <p class="hero__sub reveal" data-delay="3">
+        Mobilier et objets d'exception pensés pour créer des espaces uniques :
+        matières nobles, lignes justes, fabrication européenne.
+      </p>
+
       <div class="hero__actions reveal" data-delay="4">
-        <a class="btn btn--solid" href="collections.html">Découvrir la collection</a>
-        <a class="btn" href="boutique.html">Explorer la boutique</a>
+        <a class="btn btn--solid" href="collections.html">
+          Découvrir la collection
+        </a>
+
+        <a class="btn" href="boutique.html">
+          Explorer la boutique
+        </a>
       </div>
+
     </div>
   </div>
-  <p class="hero__meta"><span data-total-products>136</span> références · Livraison &amp; installation en Europe</p>
+
+  <p
+    class="hero__meta"
+    style="
+      position: relative;
+      z-index: 2;
+    ">
+    <span data-total-products>136</span>
+    références · Livraison &amp; installation en Europe
+  </p>
+
 </section>
 
 <!-- ============================ VALEURS =========================== -->
