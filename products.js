@@ -428,13 +428,3 @@
 
   global.ASTRANTIA_PRODUCTS = API;
 })(window);
-
-function getProductImage(productName) {
-  const fileName = productName
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/\s+/g, "-");
-
-  return `${window.location.origin}/${fileName}.jpg`;
-}
