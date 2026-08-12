@@ -37,8 +37,7 @@
         ["Comô", 1780, "Cuir nubuck, noyer massif", "L 92 × P 94 × H 74 cm", "Cuir"],
         ["Aria", 860, "Bouclette écrue, acier noir", "L 74 × P 79 × H 72 cm", "Textile"],
         ["Vernon", 1340, "Velours côtelé, laiton brossé", "L 82 × P 85 × H 74 cm", "Textile"],
-        ["Sorel", 1050, "Rotin tressé, coussins lin", "L 78 × P 80 × H 77 cm", "Rotin"],
-        ["Caca", 46000, "Rotin treffssé, coussins lian", "L 78 × P 80 × H 77 cm", "Rotigbn"]
+        ["Sorel", 1050, "Rotin tressé, coussins lin", "L 78 × P 80 × H 77 cm", "Rotin"]
       ]
     },
     {
@@ -57,7 +56,7 @@
       ]
     },
     {
-      category: "Tables basses", collection: "Salon", icon: "Table", prefix: "Table basse",
+      category: "Tables basses", collection: "Salon", icon: "table", prefix: "Table basse",
       items: [
         ["Alba", 690, "Chêne massif huilé", "L 120 × P 65 × H 36 cm", "Bois"],
         ["Onde", 940, "Travertin naturel", "Ø 90 × H 34 cm", "Pierre"],
