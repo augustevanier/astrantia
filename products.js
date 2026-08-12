@@ -57,7 +57,7 @@
       ]
     },
     {
-      category: "Tables basses", collection: "Salon", icon: "table", prefix: "Table basse",
+      category: "Tables basses", collection: "Salon", icon: "Table", prefix: "Table basse",
       items: [
         ["Alba", 690, "Chêne massif huilé", "L 120 × P 65 × H 36 cm", "Bois"],
         ["Onde", 940, "Travertin naturel", "Ø 90 × H 34 cm", "Pierre"],
