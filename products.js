@@ -434,8 +434,7 @@ function getProductImage(productName) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "-");
 
-  return `${fileName}.jpg`;
+  return `${window.location.origin}/${fileName}.jpg`;
 }
