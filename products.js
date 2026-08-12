@@ -38,6 +38,7 @@
         ["Aria", 860, "Bouclette écrue, acier noir", "L 74 × P 79 × H 72 cm", "Textile"],
         ["Vernon", 1340, "Velours côtelé, laiton brossé", "L 82 × P 85 × H 74 cm", "Textile"],
         ["Sorel", 1050, "Rotin tressé, coussins lin", "L 78 × P 80 × H 77 cm", "Rotin"]
+         ["caca", 46000, "Rotin treffssé, coussins lian", "L 78 × P 80 × H 77 cm", "Rotigbn"]
       ]
     },
     {
