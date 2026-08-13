@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /panier.html
 
-Sitemap: https://www.astrantia.fr/sitemap.xml
+Sitemap: https://astrantia.fr/sitemap.xml

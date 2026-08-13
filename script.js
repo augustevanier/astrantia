@@ -3,15 +3,48 @@
    Vanilla JS, sans dépendance. Chargé après js/products.js.
    Sommaire :
    A. Utilitaires
-   B. Visuels (placeholders CSS) & carte produit
-   C. Panier (localStorage)
-   D. Interface globale (header, menu, recherche, révélations, accordéons)
-   E. Page d'accueil
-   F. Boutique (recherche / filtres / tri / pagination)
-   G. Fiche produit
-   H. Page panier
-   I. Formulaires (contact, newsletter)
+   B. Images (cascade photo maison → photo de démo → visuel CSS)
+   C. Carte produit
+   D. Panier (localStorage)
+   E. Interface globale (header, menu, recherche, révélations, accordéons)
+   F. Page d'accueil
+   G. Boutique (recherche / filtres / tri / pagination)
+   H. Fiche produit
+   I. Page panier
+   J. Formulaires (contact, newsletter)
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   SYSTÈME D'IMAGES — à lire avant toute modification
+   --------------------------------------------------------------------------
+   Chaque visuel du site tente de charger, dans l'ordre :
+     1. votre photo maison        images/produits/<identifiant>.jpg
+     2. la photo de démonstration (banque libre de droit)
+     3. le visuel CSS de secours  (dégradé + pictogramme)
+
+   Autrement dit : DÉPOSEZ SIMPLEMENT VOTRE PHOTO dans images/produits/
+   en la nommant d'après l'identifiant du produit, et elle s'affiche
+   partout (grille, fiche, panier, produits similaires). Aucun code à toucher.
+
+   Vues supplémentaires d'une fiche produit :
+     images/produits/<identifiant>-2.jpg, -3.jpg, -4.jpg
+   Visuels d'ambiance : images/hero/, images/showroom/, images/collections/
+   Logo : images/logo.png
+   -------------------------------------------------------------------------- */
+window.ASTRANTIA_IMG = {
+  ok: function (img) {
+    img.classList.add("is-loaded");
+    var holder = img.closest(".ph") || img.parentNode;
+    if (holder && holder.classList) holder.classList.add("has-photo");
+  },
+  err: function (img) {
+    var next = img.getAttribute("data-fb");
+    if (next) { img.removeAttribute("data-fb"); img.src = next; return; }
+    img.classList.add("is-failed");
+    var holder = img.closest(".ph") || img.parentNode;
+    if (holder && holder.classList) holder.classList.remove("has-photo");
+  }
+};
 
 (function () {
   "use strict";
@@ -41,43 +74,84 @@
     };
   }
 
-  /* ====================== B. VISUELS & CARTE PRODUIT ====================== */
-  /* Les visuels sont générés en CSS (dégradés de matière + pictogramme).
-     Pour brancher de vraies photos : remplacer phHTML() par une balise <img>
-     pointant vers images/produits/<id>.jpg — rien d'autre à changer. */
-  function phHTML(icon, tone, ratio, label) {
-    return '<span class="ph ph--ratio-' + (ratio || "45") + ' ph--' + icon +
-      '" data-tone="' + tone + '" role="img" aria-label="' + esc(label || "Visuel produit") + '">' +
-      (label ? '<span class="ph-label">' + esc(label) + "</span>" : "") + "</span>";
+  /* ============================== B. IMAGES ============================== */
+  /* local : chemin du fichier que le commerçant peut déposer
+     remote : photo de démonstration (ou "" pour aucune)                   */
+  function imgHTML(local, remote, alt) {
+    return '<img class="ph__img" src="' + local + '" data-fb="' + (remote || "") +
+      '" alt="' + esc(alt || "") + '" loading="lazy" decoding="async"' +
+      ' onload="ASTRANTIA_IMG.ok(this)" onerror="ASTRANTIA_IMG.err(this)">';
   }
 
+  function mediaHTML(opts) {
+    // opts : { icon, tone, ratio, label, local, remote, alt }
+    return '<span class="ph ph--ratio-' + (opts.ratio || "45") + " ph--" + opts.icon +
+      '" data-tone="' + opts.tone + '">' +
+      imgHTML(opts.local, opts.remote, opts.alt || opts.label) +
+      (opts.label ? '<span class="ph-label">' + esc(opts.label) + "</span>" : "") +
+      "</span>";
+  }
+
+  function productMedia(p, ratio, label, view) {
+    var n = view || 1;
+    var local = "images/produits/" + p.id + (n > 1 ? "-" + n : "") + ".jpg";
+    var remote = (p.gallery && p.gallery[n - 1]) || p.photo;
+    return mediaHTML({
+      icon: p.icon, tone: p.tone, ratio: ratio, label: label,
+      local: local, remote: remote, alt: p.name + " — " + p.brand
+    });
+  }
+
+  /* Visuels d'ambiance déclarés en HTML : <span data-scene="showroom" …> */
+  function initScenes() {
+    qsa("[data-scene]").forEach(function (el) {
+      var key = el.getAttribute("data-scene");
+      var local = el.getAttribute("data-local") || ("images/showroom/" + key + ".jpg");
+      var remote = P.scenes[key] || "";
+      var alt = el.getAttribute("data-alt") || "Astrantia";
+      el.insertAdjacentHTML("afterbegin", imgHTML(local, remote, alt));
+    });
+  }
+
+  /* Logo : images/logo.png → logo du site actuel → logo texte */
+  function initLogos() {
+    qsa(".logo[data-logo]").forEach(function (el) {
+      el.insertAdjacentHTML("afterbegin",
+        '<img class="logo__img" src="images/logo.png"' +
+        ' data-fb="https://astrantia.fr/wp-content/themes/idcomweb/img/logo.png"' +
+        ' alt="Astrantia — décoration, mobilier & cadeaux"' +
+        ' onload="ASTRANTIA_IMG.ok(this)" onerror="ASTRANTIA_IMG.err(this)">');
+    });
+  }
+
+  /* ========================== C. CARTE PRODUIT =========================== */
   function productCardHTML(p, delay) {
     var badge = "";
     if (p.isNew) badge = '<span class="product-card__badge">Nouveauté</span>';
-    else if (p.isBest) badge = '<span class="product-card__badge product-card__badge--dark">Signature</span>';
+    else if (p.isBest) badge = '<span class="product-card__badge product-card__badge--dark">Coup de cœur</span>';
 
     return '<article class="product-card reveal"' + (delay ? ' data-delay="' + delay + '"' : "") + ">" +
       '<div class="product-card__media">' +
         '<a href="produit.html?id=' + p.id + '" aria-label="Voir ' + esc(p.name) + '">' +
-          phHTML(p.icon, p.tone, "45", p.category) +
+          productMedia(p, "45", "") +
         "</a>" + badge +
         '<button type="button" class="product-card__quick" data-add="' + p.id + '">Ajouter au panier</button>' +
       "</div>" +
       '<div class="product-card__body">' +
         '<a href="produit.html?id=' + p.id + '">' +
-          '<p class="product-card__cat">' + esc(p.category) + "</p>" +
+          '<p class="product-card__cat">' + esc(p.brand) + "</p>" +
           '<h3 class="product-card__name">' + esc(p.name) + "</h3>" +
         "</a>" +
         '<p class="product-card__price">' + price(p.price) + "</p>" +
       "</div></article>";
   }
 
-  /* ============================== C. PANIER ============================== */
+  /* ============================== D. PANIER ============================== */
   var CART_KEY = "astrantia_cart_v1";
   var PROMO_KEY = "astrantia_promo_v1";
   var PROMOS = { ASTRANTIA10: 0.1, BIENVENUE5: 0.05 };
-  var FREE_SHIPPING_FROM = 1500;
-  var SHIPPING_COST = 79;
+  var FREE_SHIPPING_FROM = 500;
+  var SHIPPING_COST = 39;
 
   var Cart = {
     read: function () {
@@ -150,7 +224,6 @@
     }
   };
 
-  /* Notification discrète */
   var toastTimer;
   function toast(message, linkLabel, linkHref) {
     var el = qs(".toast");
@@ -160,14 +233,13 @@
       el.setAttribute("role", "status");
       document.body.appendChild(el);
     }
-    el.innerHTML = '<span>' + esc(message) + "</span>" +
+    el.innerHTML = "<span>" + esc(message) + "</span>" +
       (linkHref ? '<a href="' + linkHref + '">' + esc(linkLabel) + "</a>" : "");
     requestAnimationFrame(function () { el.classList.add("is-visible"); });
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { el.classList.remove("is-visible"); }, 4200);
   }
 
-  /* Ajout au panier délégué : fonctionne sur tout le site */
   document.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-add]");
     if (!btn) return;
@@ -179,7 +251,7 @@
     toast(p.name + " a été ajouté à votre panier.", "Voir le panier", "panier.html");
   });
 
-  /* ========================= D. INTERFACE GLOBALE ========================= */
+  /* ========================= E. INTERFACE GLOBALE ========================= */
   function initHeader() {
     var header = qs(".site-header");
     var burger = qs("#burger");
@@ -229,7 +301,6 @@
       });
     }
 
-    /* Lien actif */
     var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
     qsa(".main-nav a").forEach(function (a) {
       var target = a.getAttribute("href").split("?")[0].toLowerCase();
@@ -286,25 +357,26 @@
     });
   }
 
-  /* ========================== E. PAGE D'ACCUEIL ========================== */
+  /* ========================== F. PAGE D'ACCUEIL ========================== */
   function initHome() {
     var grid = qs("[data-featured]");
-    if (!grid) return;
-    var list = P.featured(parseInt(grid.getAttribute("data-featured"), 10) || 8);
-    grid.innerHTML = list.map(function (p, i) {
-      return productCardHTML(p, (i % 4) + 1);
-    }).join("");
-    initReveal(grid);
+    if (grid) {
+      var list = P.featured(parseInt(grid.getAttribute("data-featured"), 10) || 8);
+      grid.innerHTML = list.map(function (p, i) {
+        return productCardHTML(p, (i % 4) + 1);
+      }).join("");
+      initReveal(grid);
+    }
 
     qsa("[data-count-collection]").forEach(function (el) {
       var c = el.getAttribute("data-count-collection");
-      el.textContent = P.byCollection(c).length + " pièces";
+      el.textContent = P.byCollection(c).length + " références";
     });
-    var total = qs("[data-total-products]");
-    if (total) total.textContent = P.all.length;
+    qsa("[data-total-products]").forEach(function (el) { el.textContent = P.all.length; });
+    qsa("[data-total-brands]").forEach(function (el) { el.textContent = P.brands.length; });
   }
 
-  /* ============================= F. BOUTIQUE ============================= */
+  /* ============================= G. BOUTIQUE ============================= */
   var PAGE_SIZE = 24;
 
   function initShop() {
@@ -324,6 +396,7 @@
       q: param("q"),
       categories: param("categorie") ? param("categorie").split(",") : [],
       collections: param("collection") ? param("collection").split(",") : [],
+      brands: param("marque") ? param("marque").split(",") : [],
       matters: param("matiere") ? param("matiere").split(",") : [],
       min: parseInt(param("min"), 10) || null,
       max: parseInt(param("max"), 10) || null,
@@ -331,7 +404,6 @@
       shown: PAGE_SIZE
     };
 
-    /* -- Construction dynamique des filtres depuis les données -- */
     function buildGroup(containerId, list, key) {
       var box = qs(containerId);
       if (!box) return;
@@ -339,12 +411,13 @@
         var checked = state[key].indexOf(o.value) > -1 ? " checked" : "";
         return '<label class="check"><input type="checkbox" value="' + esc(o.value) +
           '" data-filter="' + key + '"' + checked + '><span class="check__box"></span>' +
-          '<span>' + esc(o.value) + "</span>" +
+          "<span>" + esc(o.value) + "</span>" +
           '<span class="check__count">' + o.count + "</span></label>";
       }).join("");
     }
-    buildGroup("#filterCategories", P.categories, "categories");
     buildGroup("#filterCollections", P.collections, "collections");
+    buildGroup("#filterCategories", P.categories, "categories");
+    buildGroup("#filterBrands", P.brands, "brands");
     buildGroup("#filterMatters", P.matters, "matters");
 
     if (searchEl) searchEl.value = state.q;
@@ -352,13 +425,13 @@
     if (minEl) { minEl.placeholder = P.priceBounds.min; if (state.min) minEl.value = state.min; }
     if (maxEl) { maxEl.placeholder = P.priceBounds.max; if (state.max) maxEl.value = state.max; }
 
-    /* -- Filtrage -- */
     function compute() {
       var q = state.q ? P.slugify(state.q) : "";
       var terms = q ? q.split("-").filter(Boolean) : [];
       var list = P.all.filter(function (p) {
         if (state.categories.length && state.categories.indexOf(p.category) === -1) return false;
         if (state.collections.length && state.collections.indexOf(p.collection) === -1) return false;
+        if (state.brands.length && state.brands.indexOf(p.brand) === -1) return false;
         if (state.matters.length && state.matters.indexOf(p.matter) === -1) return false;
         if (state.min !== null && p.price < state.min) return false;
         if (state.max !== null && p.price > state.max) return false;
@@ -372,6 +445,11 @@
         case "prix-asc": list.sort(function (a, b) { return a.price - b.price; }); break;
         case "prix-desc": list.sort(function (a, b) { return b.price - a.price; }); break;
         case "az": list.sort(function (a, b) { return a.name.localeCompare(b.name, "fr"); }); break;
+        case "marque":
+          list.sort(function (a, b) {
+            return a.brand.localeCompare(b.brand, "fr") || a.name.localeCompare(b.name, "fr");
+          });
+          break;
         case "nouveautes":
           list.sort(function (a, b) { return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || a.order - b.order; });
           break;
@@ -380,17 +458,15 @@
       return list;
     }
 
-    /* -- Rendu par lots : performant même avec des milliers de produits -- */
     function render() {
       var list = compute();
       var slice = list.slice(0, state.shown);
 
       if (!slice.length) {
-        gridEl.innerHTML = "";
-        gridEl.insertAdjacentHTML("beforeend",
-          '<div class="empty-state" style="grid-column:1/-1"><h3>Aucun produit ne correspond</h3>' +
+        gridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1">' +
+          "<h3>Aucun produit ne correspond</h3>" +
           '<p class="muted">Essayez d\'élargir votre recherche ou de réinitialiser les filtres.</p>' +
-          '<p><button type="button" class="btn btn--sm" id="emptyReset">Réinitialiser</button></p></div>');
+          '<p><button type="button" class="btn btn--sm" id="emptyReset">Réinitialiser</button></p></div>';
         var er = qs("#emptyReset");
         if (er) er.addEventListener("click", resetAll);
       } else {
@@ -405,9 +481,9 @@
       countEl.textContent = list.length + (list.length > 1 ? " produits" : " produit");
 
       moreWrap.innerHTML = list.length > state.shown
-        ? '<p>' + slice.length + " sur " + list.length + " produits affichés</p>" +
+        ? "<p>" + slice.length + " sur " + list.length + " produits affichés</p>" +
           '<button type="button" class="btn" id="loadMore">Afficher plus</button>'
-        : (list.length > PAGE_SIZE ? '<p>Vous avez vu l\'ensemble de la sélection.</p>' : "");
+        : (list.length > PAGE_SIZE ? "<p>Vous avez vu l'ensemble de la sélection.</p>" : "");
       var lm = qs("#loadMore");
       if (lm) {
         lm.addEventListener("click", function () {
@@ -424,10 +500,10 @@
     function renderChips() {
       if (!chipsEl) return;
       var chips = [];
-      if (state.q) chips.push({ label: '“' + state.q + '”', type: "q" });
-      state.categories.forEach(function (v) { chips.push({ label: v, type: "categories", value: v }); });
-      state.collections.forEach(function (v) { chips.push({ label: v, type: "collections", value: v }); });
-      state.matters.forEach(function (v) { chips.push({ label: v, type: "matters", value: v }); });
+      if (state.q) chips.push({ label: "« " + state.q + " »", type: "q" });
+      ["collections", "categories", "brands", "matters"].forEach(function (key) {
+        state[key].forEach(function (v) { chips.push({ label: v, type: key, value: v }); });
+      });
       if (state.min !== null || state.max !== null) {
         chips.push({
           label: (state.min || P.priceBounds.min) + " € – " + (state.max || P.priceBounds.max) + " €",
@@ -445,30 +521,31 @@
       if (state.q) p.set("q", state.q);
       if (state.categories.length) p.set("categorie", state.categories.join(","));
       if (state.collections.length) p.set("collection", state.collections.join(","));
+      if (state.brands.length) p.set("marque", state.brands.join(","));
       if (state.matters.length) p.set("matiere", state.matters.join(","));
       if (state.min !== null) p.set("min", state.min);
       if (state.max !== null) p.set("max", state.max);
       if (state.sort !== "selection") p.set("tri", state.sort);
       var qsStr = p.toString();
       // Certains navigateurs refusent l'API History en ouverture locale (file://) :
-      // le site continue de fonctionner normalement, seule l'URL n'est pas mise à jour.
+      // le site continue de fonctionner, seule l'URL n'est pas mise à jour.
       try {
         history.replaceState(null, "", qsStr ? "boutique.html?" + qsStr : "boutique.html");
       } catch (e) { /* ignoré volontairement */ }
     }
 
     function resetAll() {
-      state.q = ""; state.categories = []; state.collections = []; state.matters = [];
+      state.q = ""; state.categories = []; state.collections = [];
+      state.brands = []; state.matters = [];
       state.min = null; state.max = null; state.sort = "selection"; state.shown = PAGE_SIZE;
       if (searchEl) searchEl.value = "";
       if (sortEl) sortEl.value = "selection";
       if (minEl) minEl.value = "";
       if (maxEl) maxEl.value = "";
-      qsa('[data-filter]').forEach(function (i) { i.checked = false; });
+      qsa("[data-filter]").forEach(function (i) { i.checked = false; });
       render();
     }
 
-    /* -- Événements -- */
     root.addEventListener("change", function (e) {
       var input = e.target.closest("[data-filter]");
       if (!input) return;
@@ -512,7 +589,8 @@
         if (type === "q") { state.q = ""; if (searchEl) searchEl.value = ""; }
         else if (type === "price") {
           state.min = null; state.max = null;
-          if (minEl) minEl.value = ""; if (maxEl) maxEl.value = "";
+          if (minEl) minEl.value = "";
+          if (maxEl) maxEl.value = "";
         } else {
           state[type] = state[type].filter(function (v) { return v !== value; });
           qsa('[data-filter="' + type + '"]').forEach(function (i) {
@@ -527,14 +605,12 @@
     var resetBtn = qs("#filterReset");
     if (resetBtn) resetBtn.addEventListener("click", resetAll);
 
-    /* Repli des groupes de filtres */
     qsa(".filter-group__title").forEach(function (b) {
       b.addEventListener("click", function () {
         b.closest(".filter-group").classList.toggle("is-closed");
       });
     });
 
-    /* Panneau filtres mobile */
     var filtersEl = qs("#filters");
     var openFilters = qs("#filtersToggle");
     var closeFilters = qs("#filtersClose");
@@ -554,11 +630,11 @@
     render();
   }
 
-  /* =========================== G. FICHE PRODUIT =========================== */
+  /* =========================== H. FICHE PRODUIT =========================== */
   function initProduct() {
     var root = qs("#productPage");
     if (!root) return;
-    var p = P.byId(param("id")) || P.byId("fauteuil-oslo");
+    var p = P.byId(param("id")) || P.featured(1)[0];
 
     if (!p) {
       root.innerHTML = '<div class="container" style="padding:120px 0 140px;text-align:center">' +
@@ -567,38 +643,38 @@
       return;
     }
 
-    document.title = p.name + " — Astrantia";
+    document.title = p.name + " — " + p.brand + " | Astrantia";
     var meta = qs('meta[name="description"]');
-    if (meta) meta.setAttribute("content", p.name + " — " + p.description.slice(0, 150));
+    if (meta) meta.setAttribute("content", p.name + " (" + p.brand + ") — " + p.description.slice(0, 140));
 
     var crumb = qs("#productCrumb");
     if (crumb) crumb.textContent = p.name;
 
-    /* Galerie : 4 cadrages générés à partir du visuel produit */
-    var tones = [p.tone, (p.tone % 8) + 1, ((p.tone + 3) % 8) + 1, ((p.tone + 5) % 8) + 1];
     var views = ["Vue d'ensemble", "Détail matière", "Mise en situation", "Profil"];
     var main = qs("#galleryMain");
     var thumbs = qs("#galleryThumbs");
-    main.innerHTML = phHTML(p.icon, tones[0], "43", views[0]);
-    thumbs.innerHTML = tones.map(function (t, i) {
+    main.innerHTML = productMedia(p, "43", views[0], 1);
+    thumbs.innerHTML = views.map(function (v, i) {
       return '<button type="button" class="gallery__thumb' + (i === 0 ? " is-active" : "") +
-        '" data-tone="' + t + '" data-view="' + esc(views[i]) + '" aria-label="' + esc(views[i]) + '">' +
-        phHTML(p.icon, t, "11", "") + "</button>";
+        '" data-view="' + (i + 1) + '" aria-label="' + esc(v) + '">' +
+        productMedia(p, "11", "", i + 1) + "</button>";
     }).join("");
     thumbs.addEventListener("click", function (e) {
       var b = e.target.closest(".gallery__thumb");
       if (!b) return;
       qsa(".gallery__thumb", thumbs).forEach(function (x) { x.classList.remove("is-active"); });
       b.classList.add("is-active");
-      main.innerHTML = phHTML(p.icon, b.getAttribute("data-tone"), "43", b.getAttribute("data-view"));
+      var n = parseInt(b.getAttribute("data-view"), 10);
+      main.innerHTML = productMedia(p, "43", views[n - 1], n);
     });
 
-    qs("#productCategory").textContent = p.category + " · Collection " + p.collection;
+    qs("#productCategory").textContent = p.brand + " · " + p.category;
     qs("#productName").textContent = p.name;
     qs("#productPrice").textContent = price(p.price);
     qs("#productDesc").textContent = p.description;
     qs("#productRef").textContent = p.ref;
     qs("#productStock").textContent = p.stock;
+    qs("#productBrand").textContent = p.brand;
     qs("#productMaterial").textContent = p.material;
     qs("#productDimensions").textContent = p.dimensions;
     qs("#productMatter").textContent = p.matter;
@@ -626,11 +702,10 @@
       }).join("");
     }
 
-    /* Lien collection */
     var colLink = qs("#productCollectionLink");
     if (colLink) {
-      colLink.href = "boutique.html?collection=" + encodeURIComponent(p.collection);
-      colLink.textContent = "Voir toute la collection " + p.collection;
+      colLink.href = "boutique.html?marque=" + encodeURIComponent(p.brand);
+      colLink.textContent = "Voir toutes les pièces " + p.brand;
     }
 
     initQtyWidgets(root);
@@ -638,7 +713,7 @@
     initReveal(root);
   }
 
-  /* ============================ H. PAGE PANIER ============================ */
+  /* ============================ I. PAGE PANIER ============================ */
   function initCartPage() {
     var root = qs("#cartPage");
     if (!root) return;
@@ -663,9 +738,9 @@
         linesEl.innerHTML = lines.map(function (l) {
           var p = P.byId(l.id);
           return '<div class="cart-line">' +
-            '<a href="produit.html?id=' + p.id + '">' + phHTML(p.icon, p.tone, "11", "") + "</a>" +
+            '<a href="produit.html?id=' + p.id + '">' + productMedia(p, "11", "") + "</a>" +
             "<div>" +
-              '<span class="cart-line__cat">' + esc(p.category) + "</span>" +
+              '<span class="cart-line__cat">' + esc(p.brand) + "</span>" +
               '<a class="cart-line__name" href="produit.html?id=' + p.id + '">' + esc(p.name) + "</a>" +
               '<p class="muted" style="font-size:13px;margin:2px 0 12px">' + esc(p.material) + "</p>" +
               '<div class="cart-line__actions">' +
@@ -686,13 +761,13 @@
       summaryEl.innerHTML =
         '<div class="summary-row"><span>Sous-total</span><span>' + price(t.sub) + "</span></div>" +
         (t.discount ? '<div class="summary-row"><span>Code ' + esc(t.code) + "</span><span>− " + price(t.discount) + "</span></div>" : "") +
-        '<div class="summary-row"><span>Livraison & installation</span><span>' +
+        '<div class="summary-row"><span>Livraison</span><span>' +
           (t.shipping === 0 ? (t.sub === 0 ? "—" : "Offerte") : price(t.shipping)) + "</span></div>" +
         '<div class="summary-row summary-row--total"><span>Total</span><span>' + price(t.total) + "</span></div>" +
         '<p class="muted" style="font-size:12px;margin:14px 0 0">' +
           (t.sub === 0 ? "Votre panier est vide."
-            : (t.shipping === 0 ? "Livraison offerte à partir de " + price(FREE_SHIPPING_FROM) + "."
-              : "Plus que " + price(FREE_SHIPPING_FROM - (t.sub - t.discount)) + " pour la livraison offerte.")) +
+            : (t.shipping === 0 ? "Livraison offerte à partir de " + price(FREE_SHIPPING_FROM) + " — ou retrait gratuit en boutique à Attignat."
+              : "Plus que " + price(FREE_SHIPPING_FROM - (t.sub - t.discount)) + " pour la livraison offerte. Retrait en boutique toujours gratuit.")) +
         "</p>";
 
       qsa("[data-cart-total]").forEach(function (el) { el.textContent = price(t.total); });
@@ -743,7 +818,7 @@
         contentEl.hidden = false;
         contentEl.innerHTML = '<div class="alert alert--ok" style="margin:0"><strong>Commande simulée avec succès.</strong>' +
           "<br>Montant : " + price(t.total) + ". Ce site est une démonstration : aucun paiement n'est traité " +
-          "et aucune donnée n'est transmise. Un conseiller Astrantia vous recontacterait sous 24 h ouvrées." +
+          "et aucune donnée n'est transmise. En conditions réelles, Astrantia vous recontacterait sous 24 h ouvrées." +
           '<p style="margin:16px 0 0"><a class="btn btn--sm" href="boutique.html">Poursuivre mes achats</a></p></div>';
       });
     }
@@ -759,7 +834,7 @@
     render();
   }
 
-  /* ============================ I. FORMULAIRES ============================ */
+  /* ============================ J. FORMULAIRES ============================ */
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
   var PHONE_RE = /^[+0-9][0-9 .\-()]{7,19}$/;
 
@@ -814,7 +889,7 @@
 
       var prenom = qs('[name="prenom"]', form).value.trim();
       form.innerHTML = '<div class="alert alert--ok"><strong>Merci ' + esc(prenom) +
-        ", votre message a bien été transmis.</strong><br>Notre équipe vous répond sous 24 heures ouvrées. " +
+        ", votre message a bien été transmis.</strong><br>Nous vous répondons sous 24 heures ouvrées. " +
         "Ce site étant une démonstration sans serveur, aucune donnée n'est réellement envoyée ni conservée.</div>" +
         '<a class="btn" href="boutique.html">Découvrir la boutique</a>';
     });
@@ -828,13 +903,15 @@
         var v = (input.value || "").trim();
         if (!EMAIL_RE.test(v)) { toast("Merci de saisir une adresse e-mail valide."); input.focus(); return; }
         form.innerHTML = '<p style="margin:0">Merci — votre inscription est enregistrée. ' +
-          "Vous recevrez nos prochaines nouveautés en avant-première.</p>";
+          "Vous recevrez nos nouveautés et nos invitations aux ateliers.</p>";
       });
     });
   }
 
   /* ============================== DÉMARRAGE ============================== */
   function boot() {
+    initLogos();
+    initScenes();
     initHeader();
     Cart.refreshBadge();
     initReveal();
@@ -847,8 +924,7 @@
     initContactForm();
     initNewsletter();
 
-    var year = qsa("[data-year]");
-    year.forEach(function (el) { el.textContent = new Date().getFullYear(); });
+    qsa("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
   }
 
   if (document.readyState === "loading") {

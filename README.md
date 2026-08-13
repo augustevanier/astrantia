@@ -1,68 +1,70 @@
-# Astrantia — site e-commerce premium
+# Astrantia — site e-commerce
 
-Site statique complet (HTML5 + CSS3 + JavaScript vanilla). **Aucune dépendance, aucun build** : ouvrez `index.html` dans un navigateur et tout fonctionne.
+Maquette complète du site d'Astrantia — décoration, mobilier & cadeaux, 40c allée des négociants, 01340 Attignat.
+HTML5 + CSS3 + JavaScript vanilla. **Aucune dépendance, aucun build** : ouvrez `index.html` et tout fonctionne.
 
 ## Structure
 
 ```
 astrantia/
-├── index.html          Accueil (hero, collections, sélection, showroom)
-├── boutique.html       Catalogue : recherche, filtres, tri, pagination
-├── produit.html        Fiche produit dynamique — produit.html?id=fauteuil-oslo
-├── collections.html    Pages éditoriales des 5 univers
-├── a-propos.html       Histoire, méthode, repères, mentions légales
-├── contact.html        Formulaire avec validation JS
-├── panier.html         Panier, code promo, commande simulée
+├── index.html          Accueil : hero, univers, sélection, marques, services, boutique
+├── boutique.html       Catalogue : recherche, filtres (univers/catégorie/marque/matière/prix), tri
+├── produit.html        Fiche dynamique — produit.html?id=chaise-luxembourg
+├── collections.html    Les six univers, en pages éditoriales
+├── a-propos.html       La maison, l'accompagnement, l'éthique, mentions légales
+├── contact.html        Formulaire validé + coordonnées réelles
+├── panier.html         Panier, code promo, retrait boutique, commande simulée
 ├── robots.txt / sitemap.xml
-├── css/style.css       Design system complet (1 190 lignes, commenté)
-├── js/products.js      Catalogue central — 136 produits
-├── js/script.js        Toute la logique du site
-└── images/             Dossiers prêts pour vos photos
+├── css/style.css       Design system complet (1 230 lignes, commenté)
+├── js/products.js      LE CATALOGUE — 130 produits, 31 marques
+├── js/script.js        Toute la logique + le système d'images
+└── images/             hero/ produits/ collections/ showroom/ + logo.png
 ```
 
-## Le catalogue (136 produits, extensible sans limite)
+## Vos photos s'affichent toutes seules
 
-Tout part de `js/products.js`. Pour **ajouter un produit**, une ligne suffit dans la famille concernée :
+Chaque visuel tente de charger, dans l'ordre :
+
+1. **votre photo** — `images/produits/<identifiant>.jpg`
+2. la photo de démonstration (banque libre de droit, déjà en place)
+3. le visuel CSS de secours
+
+Autrement dit : **déposez `images/produits/chaise-luxembourg.jpg` et la photo apparaît partout** — grille, fiche produit, panier, produits similaires. Aucun code à toucher, aucune liste à tenir à jour.
+
+- Vues supplémentaires d'une fiche : `<identifiant>-2.jpg`, `-3.jpg`, `-4.jpg`
+- Ambiances : `images/hero/accueil.jpg`, `images/collections/mobilier.jpg`, `images/showroom/boutique.jpg`…
+- Logo : `images/logo.png` (à défaut, le logo actuel d'astrantia.fr est utilisé, puis le logo texte)
+
+L'identifiant d'un produit est son nom en minuscules, sans accent, mots reliés par des tirets. Il est visible dans l'URL de sa fiche.
+
+## Le catalogue
+
+Tout part de `js/products.js`. Un produit = une ligne :
 
 ```js
-["Modèle", 890, "Chêne massif, lin lavé", "L 78 × P 82 × H 74 cm", "Bois"]
+["Modèle", 189, "Fermob", "Aluminium laqué", "L 52 × P 56 × H 88 cm", "Métal"]
 ```
 
-L'identifiant, la description, les coloris, la référence et le visuel sont générés automatiquement. Pour **ajouter une famille**, ajoutez un bloc dans `CATALOG` : les filtres de la boutique se reconstruisent tout seuls à partir des données.
-
-La boutique reste fluide à grande échelle : index de recherche pré-calculé, rendu par lots de 24 via `DocumentFragment`, aucun re-rendu inutile.
+Identifiant, référence, description, coloris, photo et présence dans les filtres sont générés automatiquement. Les filtres de la boutique (6 univers, 19 catégories, 31 marques, 8 familles de matière) se construisent à partir des données : ajouter une marque suffit à créer sa case.
 
 ## Fonctionnalités
 
-- **Recherche** multi-termes insensible aux accents (nom, catégorie, matière, référence)
-- **Filtres** catégories / collections / matières / fourchette de prix, cumulables, avec compteurs et chips supprimables
-- **Tri** sélection, nouveautés, prix croissant/décroissant, alphabétique
-- **URL partageable** : `boutique.html?collection=Chambre&matiere=Bois&tri=prix-asc`
-- **Panier** persistant (localStorage), quantités, codes promo `ASTRANTIA10` / `BIENVENUE5`, livraison offerte dès 1 500 €
-- **Fiches produits** dynamiques avec galerie 4 vues, coloris, accordéons et pièces assorties
-- **Formulaire de contact** validé côté client (champ par champ, à la volée)
-- **SEO** : titles, meta descriptions, Open Graph, canonical, structure Hn, `alt`/`aria-label`, sitemap, robots
-- **Responsive** mobile / tablette / desktop, menu hamburger, panneau de filtres plein écran sur mobile
-- **Accessibilité** : navigation clavier, `aria-*`, focus visible, `prefers-reduced-motion`
+- Recherche multi-termes insensible aux accents (nom, marque, catégorie, matière, référence)
+- Filtres cumulables avec compteurs et étiquettes supprimables · 6 tris dont « par marque »
+- URL partageable : `boutique.html?marque=Fermob&collection=Extérieur&tri=prix-asc`
+- Panier persistant, codes `ASTRANTIA10` / `BIENVENUE5`, livraison offerte dès 500 €, retrait gratuit en boutique
+- Fiches produits dynamiques, galerie 4 vues, pièces assorties
+- Bandeau des marques distribuées (logos repris d'astrantia.fr)
+- SEO complet, responsive mobile/tablette/desktop, accessibilité clavier et ARIA
 
-## Les visuels
+## Avant la mise en ligne
 
-Les images sont pour l'instant **générées en CSS** (dégradés de matière + pictogramme linéaire, 8 teintes × 12 familles). C'est volontaire : le site est cohérent immédiatement, sans fichier lourd.
-
-Pour brancher vos photos, deux points d'entrée :
-
-1. `js/script.js` → fonction `phHTML()` : remplacez le `<span class="ph">` par `<img src="images/produits/ID.jpg" alt="...">`
-2. Dans le HTML statique : remplacez les `<span class="ph ...">` par vos `<img>`
-
-Le CSS `.ph` reste utile comme état de chargement.
-
-## Mise en ligne
-
-Déposez le dossier tel quel sur n'importe quel hébergement statique (Netlify, Vercel, GitHub Pages, OVH, un simple FTP). Pensez à remplacer `https://www.astrantia.fr/` par votre domaine dans les balises `canonical`, `og:url`, `sitemap.xml` et `robots.txt`.
+- Remplacer les photos de démonstration par les visuels de la boutique
+- Ajouter `images/logo.png`
+- Vérifier les horaires exacts et compléter les mentions légales si besoin
+- Le formulaire de contact et la newsletter sont simulés : les brancher sur un service type Formspree ou Brevo
+- Le paiement est simulé : brancher Stripe ou PayPal pour vendre réellement
 
 ## Vérifications effectuées
 
-- 0 lien mort, 0 page fictive, 0 erreur 404 (tous les `href` pointent vers un fichier existant)
-- 136 produits, aucun identifiant en doublon
-- Structure HTML équilibrée sur les 7 pages, CSS sans erreur de syntaxe
-- Parcours testés automatiquement : ajout au panier, filtres, tri, recherche, pagination, promo, commande, validation du formulaire
+0 lien mort · 130 produits sans doublon d'identifiant · structure HTML équilibrée sur les 7 pages · CSS et JS sans erreur de syntaxe · parcours testés automatiquement (recherche, filtres, tri, pagination, panier, promo, commande, validation du formulaire) · cascade d'images testée aux trois niveaux.

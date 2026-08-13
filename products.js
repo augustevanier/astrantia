@@ -1,244 +1,354 @@
 /* ==========================================================================
    ASTRANTIA — Catalogue central
+   Décoration, mobilier & cadeaux — 40c allée des négociants, 01340 Attignat
    --------------------------------------------------------------------------
    Toute la boutique (grille, recherche, filtres, tri, fiches produits,
    produits similaires, panier) se nourrit UNIQUEMENT de ce fichier.
 
    POUR AJOUTER UN PRODUIT :
    ajoutez une ligne dans le tableau `items` de la famille concernée :
-     ["Modèle", prix, "Matières", "Dimensions", "Famille de matière"]
-   Un identifiant unique, une description, des coloris et un visuel sont
-   générés automatiquement. Le site supporte plusieurs milliers de références
-   sans aucune modification du code (rendu par lots + index de recherche).
+     ["Modèle", prix, "Marque", "Matières", "Dimensions", "Famille de matière"]
+   L'identifiant, la référence, la description, les coloris et le visuel sont
+   générés automatiquement.
+
+   POUR METTRE VOTRE PROPRE PHOTO :
+   déposez un fichier images/produits/<identifiant>.jpg
+   (exemple : images/produits/fauteuil-nubes.jpg).
+   Elle remplace automatiquement la photo de démonstration, sans toucher au code.
 
    POUR AJOUTER UNE FAMILLE :
-   ajoutez un bloc dans CATALOG. Les filtres de la boutique se construisent
-   dynamiquement à partir des données : rien d'autre à modifier.
+   ajoutez un bloc dans CATALOG. Les filtres de la boutique (catégories,
+   univers, marques, matières) se construisent à partir des données.
    ========================================================================== */
 
 (function (global) {
   "use strict";
 
   /* ------------------------------------------------------------------ */
-  /* 1. Source du catalogue                                              */
+  /* 1. Photothèque de démonstration                                     */
+  /*    Photos libres de droit (Unsplash, usage commercial autorisé).    */
+  /*    Elles ne s'affichent que tant qu'aucune photo maison n'existe    */
+  /*    dans images/produits/.                                           */
+  /* ------------------------------------------------------------------ */
+  var U = "https://images.unsplash.com/photo-";
+  var OPT = "?auto=format&fit=crop&w=900&q=70";
+
+  var POOLS = {
+    seating: ["1580480055273-228ff5388ef8", "1567538096630-e0c55bd6374c",
+              "1601366533287-5ee4c763ae4e", "1611967164521-abae8fba4668",
+              "1617364852223-75f57e78dc96", "1586158291800-2665f07bba79",
+              "1605702098590-d552a98dc93d", "1579656592043-a20e25a4aa4b",
+              "1723804685588-b8e95b2044f3", "1718049719688-764249c6800d",
+              "1631700679578-621a258507bb", "1586023492125-27b2c045efd7",
+              "1634712282287-14ed57b9cc89", "1634148737510-727f137375e0"],
+    tables:  ["1615920606214-6428b3324c74", "1599327286062-40b0a7f2b305",
+              "1554295405-abb8fd54f153", "1758977403341-0104135995af",
+              "1620954799930-76530e07ea5b", "1567156444932-b578b7a1afe4",
+              "1758977404039-6e834be8eca8", "1636138388621-258a72ecb07e",
+              "1568347760450-1ef7874c5f5f", "1615803796379-b4cda8e9c09c"],
+    lamps:   ["1565814329452-e1efa11c5b89", "1540932239986-30128078f3c5",
+              "1636368208791-17b81ed832d2", "1513506003901-1e6a229e2d15",
+              "1592622515232-6e3e2a0d3d9a", "1590003689662-0773d48b6417",
+              "1559924508-1461423083c5", "1512418408532-5445158b1445",
+              "1568563094147-ae8eb3a8a3c0", "1560851668-e96ae9cfe945",
+              "1568482224714-7843360d588a", "1604610728890-6f4b631ed081",
+              "1553797794-4c4d2c55dbfb", "1578678809569-1a8ead9cb802"],
+    decor:   ["1590938401285-eba3a552ece4", "1587740025983-5ad92826ae4f",
+              "1605239435870-67df4c54a0b3", "1694830470387-2e0f234ecaf7",
+              "1614635824409-75be312e41e9", "1634148737510-727f137375e0",
+              "1723750290151-164cb19ebab7", "1567156444932-b578b7a1afe4"],
+    outdoor: ["1597088136953-db42ae225804", "1719324923613-ff0884b031ed",
+              "1711098256574-7b497260cdc9", "1782073425027-e099f12e3433",
+              "1762608675427-09ac2dbd1540", "1759471606534-cbd4aca4d4cb",
+              "1783260661056-a19835b6df98", "1769168375647-843e2e822035",
+              "1781107882100-82cb2fd8cbfe", "1765097732474-973a92d6fb4c",
+              "1777370537254-927d534822e7"],
+    interior:["1714872245785-674ae3038d21", "1636138388621-258a72ecb07e",
+              "1723750290151-164cb19ebab7", "1568347760450-1ef7874c5f5f",
+              "1615803796379-b4cda8e9c09c"]
+  };
+
+  function photo(pool, i) {
+    var list = POOLS[pool] || POOLS.interior;
+    return U + list[i % list.length] + OPT;
+  }
+
+  // Visuels d'ambiance utilisés dans les pages (hero, univers, showroom)
+  var SCENES = {
+    hero:       photo("interior", 0),
+    showroom:   photo("interior", 3),
+    atelier:    photo("interior", 4),
+    mobilier:   photo("seating", 3),
+    luminaires: photo("lamps", 1),
+    decoration: photo("decor", 0),
+    table:      photo("decor", 3),
+    exterieur:  photo("outdoor", 1),
+    cadeaux:    photo("decor", 4)
+  };
+
+  /* ------------------------------------------------------------------ */
+  /* 2. Source du catalogue                                              */
   /* ------------------------------------------------------------------ */
   var CATALOG = [
+    /* ============================ MOBILIER ============================ */
     {
-      category: "Fauteuils", collection: "Salon", icon: "chair", prefix: "Fauteuil",
+      category: "Canapés & méridiennes", collection: "Mobilier", icon: "sofa",
+      pool: "seating", prefix: "Canapé",
       items: [
-        ["Oslo", 890, "Chêne massif, lin lavé", "L 78 × P 82 × H 74 cm", "Bois"],
-        ["Arca", 1290, "Noyer cintré, laine bouclée", "L 84 × P 86 × H 72 cm", "Textile"],
-        ["Malmö", 740, "Frêne clair, tissu coton", "L 72 × P 78 × H 76 cm", "Bois"],
-        ["Lucca", 1640, "Cuir pleine fleur, acier patiné", "L 88 × P 90 × H 70 cm", "Cuir"],
-        ["Sienne", 980, "Velours de coton, hêtre teinté", "L 76 × P 80 × H 75 cm", "Textile"],
-        ["Bergen", 1120, "Chêne fumé, laine mélangée", "L 80 × P 84 × H 73 cm", "Bois"],
-        ["Ravel", 1450, "Cuir grainé, piètement laiton", "L 86 × P 88 × H 71 cm", "Cuir"],
-        ["Nord", 690, "Bouleau, toile de lin", "L 70 × P 76 × H 78 cm", "Bois"],
-        ["Comô", 1780, "Cuir nubuck, noyer massif", "L 92 × P 94 × H 74 cm", "Cuir"],
-        ["Aria", 860, "Bouclette écrue, acier noir", "L 74 × P 79 × H 72 cm", "Textile"],
-        ["Vernon", 1340, "Velours côtelé, laiton brossé", "L 82 × P 85 × H 74 cm", "Textile"],
-        ["Sorel", 1050, "Rotin tressé, coussins lin", "L 78 × P 80 × H 77 cm", "Rotin"],
-        ["CACA", 3250000, "cacacuire, caca tressé", "L 3000 × P 800 × H 1990 cm", "caca partout"]
-      ]
-    },
-    
-      category: "Canapés", collection: "Salon", icon: "sofa", prefix: "Canapé",
-      items: [
-        ["Noma", 2490, "Lin épais, structure hêtre", "L 220 × P 96 × H 78 cm", "Textile"],
-        ["Halden", 3180, "Laine bouclée, mousse HR", "L 245 × P 102 × H 76 cm", "Textile"],
-        ["Vérone", 4290, "Cuir pleine fleur camel", "L 238 × P 100 × H 74 cm", "Cuir"],
-        ["Milos", 2790, "Coton lavé, chêne massif", "L 226 × P 98 × H 80 cm", "Textile"],
-        ["Lisbonne", 3450, "Velours de coton, laiton", "L 252 × P 104 × H 77 cm", "Textile"],
-        ["Ancona", 3890, "Cuir grainé, piètement noyer", "L 240 × P 99 × H 75 cm", "Cuir"],
-        ["Solstice", 2190, "Lin naturel déhoussable", "L 205 × P 94 × H 79 cm", "Textile"],
-        ["Marta", 2980, "Bouclette ivoire, frêne", "L 232 × P 100 × H 78 cm", "Textile"],
-        ["Ombre", 3620, "Velours anthracite, acier noir", "L 248 × P 103 × H 76 cm", "Textile"],
-        ["Ravenne", 4680, "Cuir nubuck, structure noyer", "L 268 × P 108 × H 74 cm", "Cuir"]
+        ["Nubes", 3290, "Home Spirit", "Lin lavé, structure hêtre massif", "L 224 × P 98 × H 78 cm", "Textile"],
+        ["Malmö", 2890, "Ethnicraft", "Coton épais, chêne massif FSC", "L 210 × P 94 × H 76 cm", "Textile"],
+        ["Otello", 3980, "Home Spirit", "Cuir pleine fleur pigmenté", "L 236 × P 100 × H 74 cm", "Cuir"],
+        ["Sereno", 2490, "Home Spirit", "Velours de coton déhoussable", "L 198 × P 92 × H 80 cm", "Textile"],
+        ["Nordic", 3450, "Ethnicraft", "Bouclette écrue, piètement teck", "L 228 × P 96 × H 75 cm", "Textile"],
+        ["Méridienne Lova", 1690, "Home Spirit", "Lin naturel, dossier bas", "L 165 × P 78 × H 72 cm", "Textile"],
+        ["Pouf Dune", 390, "Roolf Living", "Toile outdoor déperlante", "Ø 90 × H 42 cm", "Textile"]
       ]
     },
     {
-      category: "Tables basses", collection: "Salon", icon: "table", prefix: "Table basse",
+      category: "Fauteuils & assises", collection: "Mobilier", icon: "chair",
+      pool: "seating", prefix: "Fauteuil",
       items: [
-        ["Alba", 690, "Chêne massif huilé", "L 120 × P 65 × H 36 cm", "Bois"],
-        ["Onde", 940, "Travertin naturel", "Ø 90 × H 34 cm", "Pierre"],
-        ["Galet", 780, "Marbre Calacatta, acier", "L 100 × P 60 × H 32 cm", "Pierre"],
-        ["Sienna", 620, "Noyer massif, verre fumé", "L 110 × P 58 × H 38 cm", "Bois"],
-        ["Lune", 1180, "Marbre vert, laiton brossé", "Ø 100 × H 33 cm", "Pierre"],
-        ["Kaolin", 540, "Céramique émaillée, métal", "Ø 70 × H 40 cm", "Céramique"],
-        ["Brume", 860, "Verre trempé, chêne fumé", "L 130 × P 70 × H 35 cm", "Verre"],
-        ["Sillon", 720, "Frêne massif cannelé", "L 115 × P 62 × H 37 cm", "Bois"]
+        ["Kabi", 890, "Ondarreta", "Frêne massif, assise tissu", "L 74 × P 78 × H 76 cm", "Bois"],
+        ["Nube", 1290, "Ondarreta", "Laine bouclée, acier laqué", "L 80 × P 82 × H 72 cm", "Textile"],
+        ["Ovni", 1490, "New Works", "Cuir grainé, structure noyer", "L 84 × P 86 × H 74 cm", "Cuir"],
+        ["Bau", 740, "Bosc", "Chêne massif français, cannage", "L 68 × P 72 × H 78 cm", "Rotin"],
+        ["Vela", 980, "Ondarreta", "Velours côtelé, laiton brossé", "L 76 × P 80 × H 75 cm", "Textile"],
+        ["Sacco Lounge", 420, "Roolf Living", "Toile technique indoor/outdoor", "L 90 × P 100 × H 80 cm", "Textile"],
+        ["Repose-pied Kabi", 320, "Ondarreta", "Frêne massif, assise tissu", "L 52 × P 48 × H 40 cm", "Bois"]
       ]
     },
     {
-      category: "Consoles", collection: "Salon", icon: "table", prefix: "Console",
+      category: "Chaises & tabourets", collection: "Mobilier", icon: "chair",
+      pool: "seating", prefix: "",
       items: [
-        ["Élan", 890, "Chêne massif, laiton", "L 140 × P 38 × H 82 cm", "Bois"],
-        ["Ligne", 760, "Frêne teinté, acier noir", "L 120 × P 35 × H 80 cm", "Métal"],
-        ["Verso", 1240, "Noyer massif, marbre blanc", "L 150 × P 40 × H 84 cm", "Bois"],
-        ["Sablier", 980, "Travertin massif", "L 130 × P 36 × H 81 cm", "Pierre"],
-        ["Ostra", 690, "Chêne clair, cannage", "L 118 × P 34 × H 79 cm", "Rotin"],
-        ["Ivoire", 1120, "Laque mate, piètement laiton", "L 145 × P 38 × H 83 cm", "Métal"],
-        ["Trame", 840, "Frêne massif, cannage naturel", "L 128 × P 36 × H 80 cm", "Rotin"],
-        ["Havane", 1390, "Noyer massif, cuir cousu", "L 152 × P 40 × H 82 cm", "Cuir"]
+        ["Chaise Bai", 290, "Ondarreta", "Hêtre massif, assise contreplaqué", "L 46 × P 52 × H 82 cm", "Bois"],
+        ["Chaise Lund", 340, "Ondarreta", "Frêne teinté, assise paille", "L 45 × P 50 × H 80 cm", "Bois"],
+        ["Chaise Beech", 420, "Ethnicraft", "Chêne massif FSC, dossier courbé", "L 48 × P 54 × H 81 cm", "Bois"],
+        ["Chaise Nolita", 260, "Ondarreta", "Acier époxy, usage intérieur/extérieur", "L 44 × P 48 × H 84 cm", "Métal"],
+        ["Tabouret Hoop", 210, "Bosc", "Hêtre massif français", "Ø 34 × H 45 cm", "Bois"],
+        ["Tabouret de bar Kimi", 380, "Ondarreta", "Frêne, repose-pied acier noir", "Ø 38 × H 76 cm", "Bois"],
+        ["Banc Oak", 690, "Ethnicraft", "Chêne massif huilé", "L 160 × P 36 × H 45 cm", "Bois"]
       ]
     },
     {
-      category: "Chaises", collection: "Salle à manger", icon: "chair", prefix: "Chaise",
+      category: "Tables & bureaux", collection: "Mobilier", icon: "table",
+      pool: "tables", prefix: "",
       items: [
-        ["Épure", 340, "Chêne massif, assise paille", "L 46 × P 52 × H 82 cm", "Bois"],
-        ["Fjord", 420, "Frêne courbé, lin", "L 48 × P 54 × H 80 cm", "Bois"],
-        ["Cordoue", 560, "Cuir tendu, acier patiné", "L 50 × P 55 × H 81 cm", "Cuir"],
-        ["Tiva", 290, "Hêtre teinté, assise bois", "L 44 × P 50 × H 84 cm", "Bois"],
-        ["Anvers", 480, "Velours de coton, noyer", "L 49 × P 56 × H 83 cm", "Textile"],
-        ["Lino", 380, "Lin lavé, piètement frêne", "L 47 × P 53 × H 82 cm", "Textile"],
-        ["Sable", 320, "Rotin naturel, hêtre", "L 45 × P 51 × H 80 cm", "Rotin"],
-        ["Corso", 610, "Cuir grainé, laiton brossé", "L 52 × P 57 × H 82 cm", "Cuir"],
-        ["Nara", 450, "Chêne fumé, corde tressée", "L 48 × P 54 × H 79 cm", "Bois"],
-        ["Belle-Île", 390, "Bouclette écrue, acier noir", "L 47 × P 53 × H 81 cm", "Textile"]
+        ["Table Bok", 2190, "Ethnicraft", "Chêne massif FSC, assemblage tourillon", "L 220 × P 100 × H 76 cm", "Bois"],
+        ["Table Osso", 1890, "Ethnicraft", "Chêne massif, piètement ajouré", "L 200 × P 95 × H 75 cm", "Bois"],
+        ["Table Guéridon Lyon", 640, "Drugeot Manufacture", "Chêne massif français, plateau rond", "Ø 110 × H 74 cm", "Bois"],
+        ["Table basse Loti", 590, "Drugeot Manufacture", "Chêne massif, finition huilée", "L 110 × P 60 × H 38 cm", "Bois"],
+        ["Table basse Stone", 890, "Ethnicraft", "Travertin naturel", "Ø 90 × H 34 cm", "Pierre"],
+        ["Bureau Ludo", 1140, "Drugeot Manufacture", "Chêne massif, tiroir suspendu", "L 140 × P 65 × H 75 cm", "Bois"],
+        ["Console Tenon", 780, "Drugeot Manufacture", "Chêne massif, assemblage apparent", "L 130 × P 36 × H 80 cm", "Bois"]
       ]
     },
     {
-      category: "Tables", collection: "Salle à manger", icon: "table", prefix: "Table",
+      category: "Rangements & bibliothèques", collection: "Mobilier", icon: "storage",
+      pool: "tables", prefix: "",
       items: [
-        ["Épure", 1890, "Chêne massif huilé", "L 220 × P 100 × H 75 cm", "Bois"],
-        ["Riviera", 2640, "Travertin massif", "L 240 × P 105 × H 74 cm", "Pierre"],
-        ["Massif", 2180, "Noyer massif, assemblage tourillon", "L 230 × P 102 × H 76 cm", "Bois"],
-        ["Ostende", 1490, "Frêne clair, piètement acier", "L 200 × P 95 × H 75 cm", "Métal"],
-        ["Cassis", 3290, "Marbre Calacatta, laiton", "L 250 × P 110 × H 74 cm", "Pierre"],
-        ["Terra", 1740, "Chêne fumé, plateau ovale", "L 210 × P 110 × H 75 cm", "Bois"],
-        ["Ombra", 2380, "Chêne noirci, socle central", "Ø 140 × H 75 cm", "Bois"],
-        ["Ligne", 1620, "Verre trempé, acier noir", "L 205 × P 98 × H 74 cm", "Verre"],
-        ["Ravello", 2890, "Travertin, piètement sculpté", "L 245 × P 108 × H 75 cm", "Pierre"],
-        ["Vasque", 1980, "Noyer massif, plateau rond", "Ø 130 × H 75 cm", "Bois"]
+        ["Buffet Ligna", 1890, "Ethnicraft", "Chêne massif FSC, quatre portes", "L 190 × P 45 × H 78 cm", "Bois"],
+        ["Bibliothèque Nordic", 2290, "Ethnicraft", "Chêne massif, modules empilables", "L 200 × P 38 × H 200 cm", "Bois"],
+        ["Vaisselier Anjou", 1690, "Drugeot Manufacture", "Chêne massif, verre cannelé", "L 110 × P 42 × H 185 cm", "Verre"],
+        ["Meuble TV Loti", 990, "Drugeot Manufacture", "Chêne massif, deux tiroirs", "L 160 × P 40 × H 46 cm", "Bois"],
+        ["Commode Whitebird", 1290, "Ethnicraft", "Chêne massif, six tiroirs", "L 120 × P 45 × H 80 cm", "Bois"],
+        ["Chevet Tenon", 390, "Drugeot Manufacture", "Chêne massif français", "L 45 × P 38 × H 52 cm", "Bois"],
+        ["Étagère murale Line", 240, "Bosc", "Hêtre massif, fixation invisible", "L 90 × P 22 × H 4 cm", "Bois"]
+      ]
+    },
+
+    /* =========================== LUMINAIRES =========================== */
+    {
+      category: "Suspensions", collection: "Luminaires", icon: "lamp",
+      pool: "lamps", prefix: "Suspension",
+      items: [
+        ["Kila", 490, "Luxcambra", "Laiton brossé, verre opalin", "Ø 40 × H 30 cm", "Métal"],
+        ["Owl Paper", 260, "Owl Paperlamp", "Papier plissé, montage à la main", "Ø 55 × H 45 cm", "Textile"],
+        ["Karman", 380, "New Works", "Aluminium laqué mat", "Ø 34 × H 26 cm", "Métal"],
+        ["Terra", 320, "Monochromic", "Grès émaillé tourné main", "Ø 30 × H 28 cm", "Céramique"],
+        ["Halo Trio", 890, "Luxcambra", "Trois modules laiton, câblage textile", "L 120 × H 40 cm", "Métal"],
+        ["Ribbon", 440, "Owl Paperlamp", "Papier washi, structure bambou", "Ø 60 × H 60 cm", "Textile"],
+        ["Cane", 290, "Monochromic", "Rotin tressé, douille noire", "Ø 45 × H 38 cm", "Rotin"]
       ]
     },
     {
-      category: "Buffets & rangements", collection: "Salle à manger", icon: "storage", prefix: "",
+      category: "Lampes à poser", collection: "Luminaires", icon: "lamp",
+      pool: "lamps", prefix: "Lampe",
       items: [
-        ["Buffet Lima", 1890, "Chêne massif, cannage naturel", "L 180 × P 45 × H 78 cm", "Bois"],
-        ["Bibliothèque Verso", 2240, "Noyer massif, acier noir", "L 200 × P 38 × H 200 cm", "Bois"],
-        ["Vaisselier Anjou", 2680, "Frêne massif, verre cannelé", "L 120 × P 42 × H 195 cm", "Verre"],
-        ["Meuble TV Onde", 1290, "Chêne fumé, laiton brossé", "L 165 × P 40 × H 48 cm", "Bois"],
-        ["Étagère Trame", 890, "Frêne clair, tirants acier", "L 90 × P 32 × H 180 cm", "Métal"],
-        ["Buffet Cassis", 2190, "Noyer, façades laquées", "L 195 × P 46 × H 80 cm", "Bois"],
-        ["Bibliothèque Massif", 3180, "Chêne massif, modules empilables", "L 240 × P 40 × H 210 cm", "Bois"],
-        ["Vitrine Halo", 1980, "Acier patiné, verre trempé", "L 100 × P 38 × H 175 cm", "Verre"],
-        ["Buffet Ostra", 1640, "Frêne, cannage et laiton", "L 170 × P 44 × H 76 cm", "Rotin"],
-        ["Desserte Ligne", 690, "Chêne massif, roulettes laiton", "L 80 × P 44 × H 82 cm", "Bois"]
+        ["Bola", 340, "Luxcambra", "Albâtre naturel, socle laiton", "Ø 26 × H 36 cm", "Pierre"],
+        ["Atelier", 280, "Monochromic", "Acier patiné, abat-jour lin", "Ø 30 × H 46 cm", "Métal"],
+        ["Galet", 390, "Monochromic", "Céramique émaillée, coton écru", "Ø 28 × H 42 cm", "Céramique"],
+        ["Portable Ino", 190, "Fermob", "Lampe sans fil rechargeable, aluminium", "Ø 12 × H 26 cm", "Métal"],
+        ["Balad", 149, "Fermob", "Lampe nomade LED, usage extérieur", "Ø 19 × H 25 cm", "Métal"],
+        ["Lampadaire Ligne", 620, "Luxcambra", "Acier noir, diffuseur coton", "Ø 40 × H 160 cm", "Métal"],
+        ["Lampe de bureau Kn", 210, "Kngb", "Métal laqué, bras articulé", "L 45 × H 48 cm", "Métal"]
       ]
     },
     {
-      category: "Lits", collection: "Chambre", icon: "bed", prefix: "Lit",
+      category: "Appliques & éclairage extérieur", collection: "Luminaires", icon: "lamp",
+      pool: "lamps", prefix: "",
       items: [
-        ["Nord", 1690, "Chêne massif, tête de lit lin", "L 180 × P 210 × H 105 cm", "Bois"],
-        ["Aria", 2180, "Bouclette écrue, socle bois", "L 180 × P 212 × H 100 cm", "Textile"],
-        ["Sereine", 1490, "Frêne clair, sommier inclus", "L 160 × P 205 × H 98 cm", "Bois"],
-        ["Anvers", 2680, "Velours de coton, laiton", "L 200 × P 215 × H 110 cm", "Textile"],
-        ["Kyoto", 1290, "Noyer massif, ligne basse", "L 160 × P 205 × H 78 cm", "Bois"],
-        ["Ombre", 2390, "Cuir grainé, structure acier", "L 180 × P 212 × H 102 cm", "Cuir"],
-        ["Bruma", 1840, "Lin lavé, coutures apparentes", "L 180 × P 210 × H 106 cm", "Textile"],
-        ["Tête de lit Lin", 780, "Lin épais capitonné", "L 180 × P 10 × H 120 cm", "Textile"]
+        ["Applique Onde", 240, "Luxcambra", "Laiton massif, verre dépoli", "L 24 × P 14 × H 22 cm", "Verre"],
+        ["Applique Cane", 190, "Monochromic", "Rotin tressé, métal noir", "L 28 × P 16 × H 26 cm", "Rotin"],
+        ["Borne Aubanne", 690, "Roger Pradier", "Aluminium moulé, verre trempé, IP44", "Ø 18 × H 80 cm", "Métal"],
+        ["Applique Bourgogne", 490, "Roger Pradier", "Aluminium, fabrication française", "L 22 × P 24 × H 36 cm", "Métal"],
+        ["Lanterne Montana", 560, "Roger Pradier", "Aluminium, verre clair, IP44", "L 26 × P 26 × H 44 cm", "Verre"],
+        ["Guirlande Solis", 120, "Fermob", "Guirlande LED extérieure 10 m", "L 1000 cm", "Métal"]
+      ]
+    },
+
+    /* =========================== DÉCORATION =========================== */
+    {
+      category: "Objets & sculptures", collection: "Décoration", icon: "decor",
+      pool: "decor", prefix: "",
+      items: [
+        ["Vase Terra", 89, "Monochromic", "Grès émaillé tourné main", "Ø 20 × H 32 cm", "Céramique"],
+        ["Vase Onde", 74, "Monochromic", "Céramique mate, pièce unique", "Ø 16 × H 28 cm", "Céramique"],
+        ["Sculpture Rabbit", 320, "Qeeboo", "Polyéthylène recyclable, design italien", "L 34 × P 26 × H 80 cm", "Métal"],
+        ["Photophore Ambre", 42, "Ichendorf Milano", "Verre soufflé bouche", "Ø 12 × H 14 cm", "Verre"],
+        ["Coupe Travertin", 130, "Art Maker", "Travertin massif taillé main", "Ø 28 × H 8 cm", "Pierre"],
+        ["Plateau Chêne", 78, "Drugeot Manufacture", "Chêne massif français huilé", "L 46 × P 30 × H 4 cm", "Bois"],
+        ["Corbeille Osier", 68, "Haomy", "Osier tressé main", "Ø 40 × H 34 cm", "Rotin"],
+        ["Serre-livres Onyx", 145, "Art Maker", "Onyx naturel poli", "L 12 × P 10 × H 16 cm", "Pierre"]
       ]
     },
     {
-      category: "Commodes & chevets", collection: "Chambre", icon: "storage", prefix: "",
+      category: "Miroirs & cadres", collection: "Décoration", icon: "mirror",
+      pool: "decor", prefix: "Miroir",
       items: [
-        ["Commode Aster", 1290, "Chêne massif, six tiroirs", "L 120 × P 45 × H 82 cm", "Bois"],
-        ["Commode Lune", 1580, "Noyer, poignées laiton", "L 135 × P 48 × H 85 cm", "Bois"],
-        ["Chevet Onde", 420, "Frêne clair, tiroir unique", "L 45 × P 38 × H 52 cm", "Bois"],
-        ["Chevet Galet", 540, "Travertin, plateau rond", "Ø 42 × H 55 cm", "Pierre"],
-        ["Commode Trame", 1140, "Frêne, façades cannage", "L 110 × P 44 × H 80 cm", "Rotin"],
-        ["Chevet Ligne", 380, "Acier noir, plateau chêne", "L 42 × P 36 × H 54 cm", "Métal"],
-        ["Armoire Nord", 2890, "Chêne massif, deux portes", "L 160 × P 60 × H 210 cm", "Bois"],
-        ["Coiffeuse Aria", 980, "Frêne clair, miroir intégré", "L 100 × P 45 × H 140 cm", "Bois"]
+        ["Halo", 320, "Peridesign", "Laiton brossé, verre biseauté", "Ø 80 cm", "Métal"],
+        ["Arche", 420, "Drugeot Manufacture", "Chêne massif cintré", "L 70 × H 150 cm", "Bois"],
+        ["Ligne", 260, "Peridesign", "Acier noir, format rectangulaire", "L 60 × H 120 cm", "Métal"],
+        ["Cane", 190, "Haomy", "Rotin tressé, verre clair", "Ø 70 cm", "Rotin"],
+        ["Ovale", 280, "Drugeot Manufacture", "Frêne clair, suspension cuir", "L 55 × H 90 cm", "Bois"],
+        ["Bronze", 480, "Peridesign", "Verre bronze, cadre laiton", "L 90 × H 140 cm", "Verre"]
       ]
     },
     {
-      category: "Textiles", collection: "Chambre", icon: "rug", prefix: "",
+      category: "Textiles & tapis", collection: "Décoration", icon: "rug",
+      pool: "decor", prefix: "",
       items: [
-        ["Plaid Alpaga", 240, "Alpaga et laine mérinos", "130 × 190 cm", "Textile"],
-        ["Coussin Lin", 68, "Lin lavé, garnissage plumes", "50 × 50 cm", "Textile"],
-        ["Coussin Chevron", 82, "Laine tissée main", "45 × 65 cm", "Textile"],
-        ["Parure Cotone", 320, "Percale de coton lavé", "240 × 260 cm", "Textile"],
-        ["Plaid Bouclette", 190, "Laine bouclée écrue", "140 × 200 cm", "Textile"],
-        ["Coussin Velours", 94, "Velours de coton, passepoil", "40 × 60 cm", "Textile"],
-        ["Rideau Voile", 160, "Voile de lin, œillets laiton", "140 × 280 cm", "Textile"],
-        ["Couvre-lit Ombre", 380, "Coton gaufré, finition main", "250 × 270 cm", "Textile"]
+        ["Plaid Alpaga", 180, "Haomy", "Alpaga et laine mérinos", "130 × 190 cm", "Textile"],
+        ["Coussin Lin lavé", 54, "Haomy", "Lin lavé, garnissage plumes", "50 × 50 cm", "Textile"],
+        ["Coussin Chevron", 62, "Haomy", "Laine tissée main", "45 × 65 cm", "Textile"],
+        ["Tapis Berbère", 690, "Haomy", "Laine vierge, nouage traditionnel", "200 × 290 cm", "Textile"],
+        ["Tapis Jute", 340, "Haomy", "Jute et coton tissés", "170 × 240 cm", "Textile"],
+        ["Rideau Voile", 120, "Au Fil des Couleurs", "Voile de lin, œillets laiton", "140 × 280 cm", "Textile"],
+        ["Plaid Bouclette", 145, "Haomy", "Laine bouclée écrue", "140 × 200 cm", "Textile"]
       ]
     },
     {
-      category: "Luminaires", collection: "Décoration", icon: "lamp", prefix: "",
+      category: "Papiers peints & murs", collection: "Décoration", icon: "room",
+      pool: "interior", prefix: "Papier peint",
       items: [
-        ["Lampe Atelier", 320, "Acier patiné, abat-jour lin", "Ø 32 × H 48 cm", "Métal"],
-        ["Suspension Halo", 590, "Laiton brossé, verre opalin", "Ø 45 × H 30 cm", "Métal"],
-        ["Lampadaire Ligne", 740, "Acier noir, diffuseur coton", "Ø 40 × H 165 cm", "Métal"],
-        ["Applique Onde", 280, "Laiton massif, verre dépoli", "L 24 × P 14 × H 22 cm", "Verre"],
-        ["Lampe Galet", 390, "Céramique émaillée, lin", "Ø 30 × H 45 cm", "Céramique"],
-        ["Suspension Terra", 460, "Terre cuite émaillée", "Ø 38 × H 34 cm", "Céramique"],
-        ["Lampadaire Arc", 980, "Marbre blanc, laiton", "L 180 × H 210 cm", "Pierre"],
-        ["Lampe Céleste", 520, "Albâtre naturel, socle laiton", "Ø 26 × H 38 cm", "Pierre"],
-        ["Suspension Papier", 240, "Papier washi, structure bambou", "Ø 55 × H 55 cm", "Textile"],
-        ["Applique Trame", 310, "Rotin tressé, métal noir", "L 28 × P 16 × H 26 cm", "Rotin"],
-        ["Lampe Sillon", 350, "Grès émaillé, abat-jour coton", "Ø 28 × H 42 cm", "Céramique"],
-        ["Lampadaire Nord", 640, "Chêne massif, coton écru", "Ø 42 × H 158 cm", "Bois"]
+        ["Jardin d'Hiver", 190, "Au Fil des Couleurs", "Intissé, impression numérique", "Lé de 68,5 cm × 10 m", "Textile"],
+        ["Feuillage", 165, "Au Fil des Couleurs", "Intissé mat, pose encollage mur", "Lé de 68,5 cm × 10 m", "Textile"],
+        ["Uni Craie", 120, "Au Fil des Couleurs", "Intissé texturé, teinte unie", "Lé de 68,5 cm × 10 m", "Textile"],
+        ["Panoramique Bosquet", 420, "Au Fil des Couleurs", "Panoramique 4 lés, sur mesure", "280 × 300 cm", "Textile"],
+        ["Rayure Lin", 148, "Au Fil des Couleurs", "Intissé effet tissé", "Lé de 68,5 cm × 10 m", "Textile"],
+        ["Nuancier Peinture", 8, "Au Fil des Couleurs", "Échantillon teinte, 12 × 12 cm", "12 × 12 cm", "Textile"]
+      ]
+    },
+
+    /* ========================= ART DE LA TABLE ======================== */
+    {
+      category: "Verrerie & vaisselle", collection: "Art de la table", icon: "decor",
+      pool: "decor", prefix: "",
+      items: [
+        ["Verre Bilia", 28, "Ichendorf Milano", "Verre borosilicate soufflé bouche", "Ø 8 × H 10 cm", "Verre"],
+        ["Carafe Herbarium", 74, "Ichendorf Milano", "Verre soufflé, décor botanique", "Ø 10 × H 26 cm", "Verre"],
+        ["Assiette Grès", 24, "Monochromic", "Grès émaillé, passe au lave-vaisselle", "Ø 27 cm", "Céramique"],
+        ["Bol Grès", 19, "Monochromic", "Grès émaillé mat", "Ø 16 × H 8 cm", "Céramique"],
+        ["Pichet Onde", 58, "Monochromic", "Céramique tournée main", "Ø 12 × H 22 cm", "Céramique"],
+        ["Set de table Lin", 22, "Haomy", "Lin lavé, ourlet main", "35 × 48 cm", "Textile"],
+        ["Planche Chêne", 64, "Drugeot Manufacture", "Chêne massif français", "L 40 × P 22 × H 2 cm", "Bois"]
       ]
     },
     {
-      category: "Objets & décoration", collection: "Décoration", icon: "decor", prefix: "",
+      category: "Bougies & senteurs", collection: "Art de la table", icon: "decor",
+      pool: "decor", prefix: "",
       items: [
-        ["Vase Terra", 140, "Terre cuite tournée main", "Ø 22 × H 34 cm", "Céramique"],
-        ["Vase Onde", 180, "Grès émaillé mat", "Ø 18 × H 40 cm", "Céramique"],
-        ["Bougeoir Ligne", 96, "Laiton massif tourné", "Ø 9 × H 24 cm", "Métal"],
-        ["Corbeille Osier", 110, "Osier tressé main", "Ø 42 × H 36 cm", "Rotin"],
-        ["Plateau Chêne", 130, "Chêne massif huilé", "L 48 × P 32 × H 4 cm", "Bois"],
-        ["Sculpture Galet", 260, "Marbre sculpté à la main", "L 24 × P 14 × H 18 cm", "Pierre"],
-        ["Bol Grès", 74, "Grès émaillé, pièce unique", "Ø 26 × H 10 cm", "Céramique"],
-        ["Photophore Ambre", 58, "Verre soufflé bouche", "Ø 12 × H 14 cm", "Verre"],
-        ["Serre-livres Onyx", 220, "Onyx naturel poli", "L 12 × P 10 × H 16 cm", "Pierre"],
-        ["Coupe Travertin", 190, "Travertin massif", "Ø 30 × H 8 cm", "Pierre"]
+        ["Bougie flambeau", 12, "Ester & Erik", "Cire teintée dans la masse, Danemark", "Ø 2,2 × H 32 cm", "Textile"],
+        ["Coffret 12 flambeaux", 118, "Ester & Erik", "Douze bougies, coffret cadeau", "Ø 2,2 × H 32 cm", "Textile"],
+        ["Bougie parfumée Figuier", 38, "Les Bougies de Léa", "Cire végétale, fabrication artisanale", "Ø 8 × H 9 cm", "Céramique"],
+        ["Bougie parfumée Cèdre", 38, "Les Bougies de Léa", "Cire végétale, mèche coton", "Ø 8 × H 9 cm", "Céramique"],
+        ["Photophore Marrakech", 26, "Les Bougies de Marrakech", "Verre soufflé et métal ciselé", "Ø 10 × H 12 cm", "Verre"],
+        ["Bougie sculptée", 22, "Les Bougies de Marrakech", "Cire sculptée à la main", "Ø 9 × H 14 cm", "Textile"],
+        ["Bougeoir Laiton", 48, "Peridesign", "Laiton massif tourné", "Ø 9 × H 22 cm", "Métal"]
+      ]
+    },
+
+    /* ============================ EXTÉRIEUR =========================== */
+    {
+      category: "Mobilier de jardin", collection: "Extérieur", icon: "outdoor",
+      pool: "outdoor", prefix: "",
+      items: [
+        ["Chaise Luxembourg", 189, "Fermob", "Aluminium laqué, 24 coloris, fab. française", "L 52 × P 56 × H 88 cm", "Métal"],
+        ["Table Bistro pliante", 219, "Fermob", "Acier laqué, pliante, fab. française", "L 71 × P 71 × H 74 cm", "Métal"],
+        ["Fauteuil Bas Luxembourg", 289, "Fermob", "Aluminium laqué mat", "L 66 × P 82 × H 82 cm", "Métal"],
+        ["Table Ellipse", 1290, "Les Jardins", "Teck massif FSC, plateau ovale", "L 220 × P 100 × H 75 cm", "Bois"],
+        ["Bain de soleil Hegoa", 980, "Les Jardins", "Teck et toile Batyline", "L 200 × P 70 × H 38 cm", "Textile"],
+        ["Canapé Ninix", 3480, "Royal Botania", "Inox brossé, coussins Sunbrella", "L 220 × P 90 × H 68 cm", "Métal"],
+        ["Fauteuil Alura", 890, "Royal Botania", "Aluminium et corde tressée", "L 70 × P 76 × H 74 cm", "Métal"],
+        ["Pouf outdoor Dune", 340, "Roolf Living", "Toile technique déperlante", "Ø 80 × H 40 cm", "Textile"]
       ]
     },
     {
-      category: "Tapis", collection: "Décoration", icon: "rug", prefix: "Tapis",
+      category: "Parasols & ombrage", collection: "Extérieur", icon: "outdoor",
+      pool: "outdoor", prefix: "Parasol",
       items: [
-        ["Sable", 690, "Laine nouée main", "200 × 300 cm", "Textile"],
-        ["Trame", 480, "Jute et coton tissés", "160 × 230 cm", "Textile"],
-        ["Berbère", 890, "Laine vierge, nouage traditionnel", "200 × 290 cm", "Textile"],
-        ["Onde", 620, "Laine et viscose", "170 × 240 cm", "Textile"],
-        ["Lin", 540, "Lin et coton, tissage plat", "180 × 270 cm", "Textile"],
-        ["Ombre", 980, "Laine haute densité", "240 × 340 cm", "Textile"]
+        ["Alu-Smart", 490, "Glatz", "Toile polyester, mât aluminium", "Ø 250 cm", "Textile"],
+        ["Sombrano", 1690, "Glatz", "Parasol déporté, rotation 360°", "Ø 350 cm", "Textile"],
+        ["Fortero", 1290, "Glatz", "Toile acrylique teintée masse", "Ø 300 cm", "Textile"],
+        ["Piètement dalle", 290, "Glatz", "Dalles béton et acier", "L 50 × P 50 cm", "Pierre"],
+        ["Voile d'ombrage", 240, "Les Jardins", "Toile technique anti-UV", "300 × 400 cm", "Textile"]
       ]
     },
     {
-      category: "Miroirs", collection: "Décoration", icon: "mirror", prefix: "Miroir",
+      category: "Braseros & plancha", collection: "Extérieur", icon: "outdoor",
+      pool: "outdoor", prefix: "",
       items: [
-        ["Halo", 420, "Laiton brossé, verre biseauté", "Ø 80 cm", "Métal"],
-        ["Arche", 560, "Chêne massif cintré", "L 70 × H 150 cm", "Bois"],
-        ["Ligne", 340, "Acier noir, format rectangulaire", "L 60 × H 120 cm", "Métal"],
-        ["Ovale", 380, "Frêne clair, suspension cuir", "L 55 × H 90 cm", "Bois"],
-        ["Trame", 290, "Rotin tressé, verre clair", "Ø 70 cm", "Rotin"],
-        ["Bronze", 640, "Verre bronze, cadre laiton", "L 90 × H 140 cm", "Verre"]
+        ["Brasero Ofyr Classic 85", 1690, "Ofyr", "Acier corten, plancha intégrée", "Ø 85 × H 100 cm", "Métal"],
+        ["Ofyr Island 85", 2890, "Ofyr", "Acier corten et bois, plan de travail", "L 140 × P 85 × H 100 cm", "Métal"],
+        ["Brasero Bowl", 390, "Hofats", "Acier inoxydable, design allemand", "Ø 60 × H 35 cm", "Métal"],
+        ["Cône de feu", 290, "Hofats", "Acier corten, allumage rapide", "Ø 45 × H 55 cm", "Métal"],
+        ["Barbecue The Bastard Large", 890, "The Bastard", "Céramique kamado, couvercle fonte", "Ø 57 × H 118 cm", "Céramique"],
+        ["Housse Bastard", 120, "The Bastard", "Toile technique déperlante", "Ø 60 × H 120 cm", "Textile"],
+        ["Table à feu Gravity", 640, "Hofats", "Acier laqué, brasero central", "Ø 90 × H 45 cm", "Métal"]
+      ]
+    },
+
+    /* ============================= CADEAUX ============================ */
+    {
+      category: "Petits cadeaux", collection: "Cadeaux", icon: "decor",
+      pool: "decor", prefix: "",
+      items: [
+        ["Hoptimist Bumble", 32, "Hoptimist", "Bois et plastique ABS, design danois", "Ø 6 × H 9 cm", "Bois"],
+        ["Hoptimist Bimble", 26, "Hoptimist", "Figurine à ressort, coloris assortis", "Ø 5 × H 7 cm", "Bois"],
+        ["Carnet Kn", 18, "Kngb", "Papier recyclé, couverture toilée", "A5", "Textile"],
+        ["Porte-clés Laiton", 24, "Peridesign", "Laiton massif gravé", "L 6 cm", "Métal"],
+        ["Mug Grès", 22, "Monochromic", "Grès émaillé, pièce artisanale", "Ø 8 × H 10 cm", "Céramique"],
+        ["Coffret bougies", 46, "Les Bougies de Léa", "Deux bougies parfumées, coffret", "L 20 × P 10 cm", "Céramique"],
+        ["Carte cadeau Astrantia", 50, "Astrantia", "Valable un an en boutique", "—", "Textile"],
+        ["Sac Mon Dada", 68, "Mon Dada", "Coton recyclé, sérigraphie main", "L 38 × H 42 cm", "Textile"]
       ]
     },
     {
-      category: "Extérieur", collection: "Extérieur", icon: "outdoor", prefix: "",
+      category: "Jeux & univers enfant", collection: "Cadeaux", icon: "decor",
+      pool: "decor", prefix: "",
       items: [
-        ["Fauteuil Riva", 780, "Teck massif FSC, corde marine", "L 74 × P 80 × H 76 cm", "Bois"],
-        ["Table Teck", 1690, "Teck massif non traité", "L 220 × P 100 × H 75 cm", "Bois"],
-        ["Chaise longue Solis", 940, "Teck et toile outdoor", "L 200 × P 68 × H 38 cm", "Textile"],
-        ["Banc Ostende", 690, "Teck massif, lattes fines", "L 160 × P 42 × H 45 cm", "Bois"],
-        ["Canapé Terrasse", 2380, "Aluminium poudré, coussins outdoor", "L 210 × P 88 × H 72 cm", "Métal"],
-        ["Lanterne Solis", 180, "Verre et laiton, usage extérieur", "Ø 18 × H 36 cm", "Verre"],
-        ["Table basse Béton", 540, "Béton ciré, finition minérale", "Ø 80 × H 32 cm", "Pierre"],
-        ["Parasol Lin", 890, "Toile lin outdoor, mât frêne", "Ø 300 × H 250 cm", "Textile"],
-        ["Fauteuil Corde", 720, "Corde tressée, structure alu", "L 72 × P 78 × H 74 cm", "Métal"],
-        ["Bain de soleil Onde", 1140, "Teck massif, matelas déperlant", "L 205 × P 72 × H 40 cm", "Bois"]
+        ["Lampe Rabbit S", 190, "Qeeboo", "Polyéthylène, éclairage LED", "L 24 × P 18 × H 44 cm", "Métal"],
+        ["Tabouret Ribbon", 240, "Qeeboo", "Polyéthylène recyclable", "Ø 34 × H 42 cm", "Métal"],
+        ["Jeu de quilles bois", 42, "Bosc", "Hêtre massif français, sac coton", "L 30 cm", "Bois"],
+        ["Mobile Hoptimist", 38, "Hoptimist", "Bois hêtre et fil coton", "Ø 30 cm", "Bois"],
+        ["Coussin enfant", 34, "Haomy", "Coton bio, garnissage recyclé", "35 × 35 cm", "Textile"],
+        ["Veilleuse Papier", 58, "Owl Paperlamp", "Papier plissé, LED basse conso", "Ø 20 × H 24 cm", "Textile"]
       ]
     }
   ];
 
   /* ------------------------------------------------------------------ */
-  /* 2. Génération : identifiants, descriptions, coloris, visuels        */
+  /* 3. Génération : identifiants, descriptions, coloris, visuels        */
   /* ------------------------------------------------------------------ */
   var COLOR_LIBRARY = {
     "Lin naturel": "#DDD3C2", "Écru": "#EFE9DE", "Beige sable": "#D4C4AC",
@@ -250,43 +360,38 @@
 
   var DESCRIPTIONS = {
     chair: [
-      "Une assise enveloppante aux lignes tendues, pensée pour les longues soirées. Le dossier légèrement incliné et la profondeur généreuse en font une pièce aussi confortable que graphique.",
-      "Silhouette épurée et proportions justes : {name} s'installe aussi bien dans un salon contemporain qu'au coin d'une bibliothèque. Chaque assemblage est réalisé à la main dans nos ateliers.",
-      "Un dessin sobre, presque architectural, mis en valeur par des matières franches. La structure apparente révèle la qualité du travail d'ébénisterie."
+      "Une assise au dessin franc, choisie pour son confort autant que pour sa ligne. {brand} soigne particulièrement les proportions et la qualité des garnissages.",
+      "{name} trouve sa place aussi bien autour d'une table que dans un coin lecture. Une pièce que l'on garde longtemps, et qui se patine bien.",
+      "Signée {brand}, cette assise associe une structure solide à des matières agréables au toucher. Plusieurs finitions disponibles en boutique."
     ],
     sofa: [
-      "Assise profonde, dossier coulissant et coussins garnis en mousse haute résilience : {name} privilégie le confort durable à l'effet de mode. Housses déhoussables et nettoyables.",
-      "Un canapé de belle largeur, dont les volumes bas et généreux structurent la pièce sans l'alourdir. Les coutures apparentes soulignent la précision de la confection.",
-      "Pensé comme une pièce centrale, {name} associe une ossature massive à un rembourrage souple. Les proportions ont été affinées pour les intérieurs de caractère."
+      "Assise profonde et garnissage haute résilience : {name} est pensé pour le quotidien, pas seulement pour la photo. Housses déhoussables et nettoyables.",
+      "Un canapé aux volumes généreux mais à la ligne basse, qui structure la pièce sans l'alourdir. Fabrication {brand}, finitions personnalisables.",
+      "{brand} construit ses assises sur ossature massive. Le confort ne s'affaisse pas au bout de deux saisons — c'est tout l'intérêt."
     ],
     table: [
-      "Un plateau massif aux arêtes adoucies, porté par un piètement dessiné pour disparaître. Chaque pièce révèle un veinage unique, signature du matériau brut.",
-      "Les proportions de {name} ont été étudiées pour circuler librement autour de la table. Finition huilée naturelle, entretien simple, patine qui se bonifie avec les années.",
-      "Ligne franche et matière noble : une pièce sobre qui devient le point d'ancrage de la pièce. Assemblages traditionnels, sans visserie apparente."
+      "Un plateau massif aux arêtes adoucies, porté par un piètement dessiné pour se faire oublier. Chaque pièce présente un veinage unique.",
+      "{name} est proposé en plusieurs longueurs. Les proportions ont été étudiées pour circuler facilement autour de la table.",
+      "Fabrication {brand} : assemblages traditionnels, finition huilée naturelle, entretien simple et patine qui se bonifie avec le temps."
     ],
     storage: [
-      "Rangement généreux et façades sobres : {name} organise sans jamais s'imposer. Charnières à fermeture douce et intérieur en placage naturel.",
-      "Une menuiserie soignée, des poignées intégrées et des volumes calibrés au centimètre. Le meuble se fait discret pour laisser respirer l'espace.",
-      "Conçu pour durer, {name} associe un caisson massif à des finitions travaillées à la main. Étagères réglables et passage de câbles dissimulé."
-    ],
-    bed: [
-      "Une tête de lit habillée avec soin et un socle bas qui allège la silhouette. {name} installe immédiatement une atmosphère calme et enveloppante.",
-      "Structure massive, sommier à lattes intégré et finitions textiles douces : le sommeil dans sa version la plus sobre. Livré démonté, montage sans outil spécifique.",
-      "Des lignes horizontales apaisantes et des matières tactiles. La hauteur de couchage a été pensée pour un usage quotidien confortable."
+      "Rangement généreux, façades sobres et charnières à fermeture douce. {name} organise sans jamais s'imposer.",
+      "Une menuiserie soignée et des volumes calibrés au centimètre, dans la tradition de {brand}. Étagères réglables.",
+      "Conçu pour durer : caisson massif, finitions travaillées à la main et passage de câbles dissimulé."
     ],
     lamp: [
-      "Une lumière chaude et diffuse, filtrée par un abat-jour choisi pour sa densité. {name} éclaire sans éblouir et sculpte les volumes en fin de journée.",
-      "Un objet lumineux au dessin minimal, à mi-chemin entre la sculpture et l'usage. Compatible ampoules LED E27, variateur recommandé.",
-      "Le contraste entre la matière brute du corps et la douceur du diffuseur crée une lumière enveloppante, idéale en éclairage d'appoint."
+      "Une lumière chaude et diffuse, filtrée par un diffuseur choisi pour sa densité. {name} éclaire sans éblouir.",
+      "Objet lumineux au dessin minimal, à mi-chemin entre la sculpture et l'usage. Compatible LED, variateur recommandé.",
+      "{brand} travaille la matière brute et la douceur du diffuseur. Idéal en éclairage d'appoint, seul ou par trois."
     ],
     decor: [
       "Pièce façonnée à la main : chaque exemplaire présente d'infimes variations de teinte et de texture qui en font un objet unique.",
-      "Un objet simple, sans ornement superflu, dont toute la présence tient à la justesse des proportions et à la qualité de la matière.",
-      "{name} apporte cette touche de matière naturelle qui réchauffe une console, une table ou une étagère."
+      "{name} apporte cette touche de matière naturelle qui réchauffe une console, une table ou une étagère. Édition {brand}.",
+      "Un objet simple, sans ornement superflu, dont toute la présence tient à la justesse des proportions."
     ],
     rug: [
-      "Tissé sur métier traditionnel, ce tapis apporte chaleur et absorption acoustique. Les nuances irrégulières signent le travail manuel.",
-      "Une matière dense et souple sous le pied, dans des teintes naturelles qui s'accordent avec tous les bois. Sous-tapis antidérapant conseillé.",
+      "Tissé sur métier traditionnel, il apporte chaleur et confort acoustique. Les nuances irrégulières signent le travail manuel.",
+      "Une matière dense et souple, dans des teintes naturelles qui s'accordent avec tous les bois. Sélection {brand}.",
       "{name} délimite l'espace sans le cloisonner. Nettoyage à sec recommandé pour préserver la fibre."
     ],
     mirror: [
@@ -295,15 +400,15 @@
       "Le verre légèrement teinté adoucit le reflet et donne de la profondeur au mur qu'il habille."
     ],
     outdoor: [
-      "Conçu pour vivre dehors : matériaux sélectionnés pour leur résistance aux UV et à l'humidité. La patine se développe naturellement avec les saisons.",
-      "{name} prolonge l'intérieur sur la terrasse ou au jardin, avec le même soin apporté aux finitions. Coussins déperlants et séchage rapide.",
-      "Une pièce d'extérieur pensée pour durer plusieurs décennies, avec des assemblages démontables et des pièces détachées disponibles."
+      "Conçu pour vivre dehors : matériaux sélectionnés pour leur résistance aux UV et à l'humidité. {brand} garantit ses finitions plusieurs années.",
+      "{name} prolonge l'intérieur sur la terrasse ou au jardin, avec le même soin apporté aux détails. Pièces détachées disponibles.",
+      "Une pièce d'extérieur pensée pour durer, démontable et facile à hiverner. Large choix de coloris chez {brand}."
+    ],
+    room: [
+      "Un décor mural qui change complètement une pièce sans travaux lourds. Pose à l'encollage du mur, dépose sans résidu.",
+      "{name} est édité par {brand}, maison spécialisée dans le papier peint depuis plusieurs décennies. Échantillon disponible sur demande.",
+      "Impression soignée sur intissé mat. Prévoyez un lé supplémentaire pour les raccords."
     ]
-  };
-
-  var USAGE = {
-    Salon: "salon", "Salle à manger": "salle à manger", Chambre: "chambre",
-    "Décoration": "intérieur", "Extérieur": "extérieur"
   };
 
   function slugify(str) {
@@ -317,47 +422,49 @@
 
   var products = [];
   var index = 0;
+  var poolCounters = {};
 
   CATALOG.forEach(function (family) {
     family.items.forEach(function (row) {
-      var model = row[0];
-      var price = row[1];
-      var material = row[2];
-      var dimensions = row[3];
-      var matterFamily = row[4];
+      var model = row[0], price = row[1], brand = row[2];
+      var material = row[3], dimensions = row[4], matterFamily = row[5];
       var name = family.prefix ? family.prefix + " " + model : model;
       var id = slugify(name);
 
-      var tpl = DESCRIPTIONS[family.icon];
-      var description = tpl[index % tpl.length].replace(/\{name\}/g, name);
+      var tpl = DESCRIPTIONS[family.icon] || DESCRIPTIONS.decor;
+      var description = tpl[index % tpl.length]
+        .replace(/\{name\}/g, name)
+        .replace(/\{brand\}/g, brand);
 
-      var colors = [
-        COLOR_NAMES[index % COLOR_NAMES.length],
-        COLOR_NAMES[(index + 4) % COLOR_NAMES.length],
-        COLOR_NAMES[(index + 8) % COLOR_NAMES.length]
-      ];
+      poolCounters[family.pool] = (poolCounters[family.pool] || 0) + 1;
 
       products.push({
         id: id,
         name: name,
         model: model,
+        brand: brand,
         category: family.category,
         collection: family.collection,
         matter: matterFamily,
         price: price,
         description: description,
-        longText: "Fabriqué en Europe dans un atelier partenaire de la maison, " + name +
-          " est réalisé à la commande. Comptez 3 à 5 semaines de délai selon les finitions. " +
-          "Une pièce pensée pour le " + (USAGE[family.collection] || "quotidien") +
-          ", livrée et installée par nos équipes.",
+        longText: brand === "Astrantia"
+          ? "Disponible immédiatement en boutique à Attignat, ou expédiée sous 48 h."
+          : "Pièce " + brand + " sélectionnée par Astrantia. Disponible en boutique à Attignat ou sur commande — comptez 2 à 6 semaines selon la finition. Nos conseillères vous aident à choisir la teinte et les dimensions.",
         material: material,
         dimensions: dimensions,
-        colors: colors.map(function (c) { return { name: c, hex: COLOR_LIBRARY[c] }; }),
+        colors: [
+          COLOR_NAMES[index % COLOR_NAMES.length],
+          COLOR_NAMES[(index + 4) % COLOR_NAMES.length],
+          COLOR_NAMES[(index + 8) % COLOR_NAMES.length]
+        ].map(function (c) { return { name: c, hex: COLOR_LIBRARY[c] }; }),
         icon: family.icon,
+        pool: family.pool,
+        photo: photo(family.pool, poolCounters[family.pool] - 1),
         tone: (index % 8) + 1,
         isNew: index % 9 === 3,
         isBest: index % 11 === 2,
-        stock: index % 13 === 5 ? "Sur commande" : "En stock",
+        stock: index % 13 === 5 ? "Sur commande" : "En stock à Attignat",
         ref: "AST-" + String(1000 + index),
         order: index
       });
@@ -365,8 +472,17 @@
     });
   });
 
+  /* Photos secondaires de la fiche produit (galerie 4 vues) */
+  products.forEach(function (p) {
+    var list = POOLS[p.pool];
+    var start = list.indexOf(p.photo.replace(U, "").replace(OPT, ""));
+    p.gallery = [0, 1, 2, 3].map(function (k) {
+      return U + list[(start + k * 3 + list.length) % list.length] + OPT;
+    });
+  });
+
   /* ------------------------------------------------------------------ */
-  /* 3. API publique                                                     */
+  /* 4. API publique                                                     */
   /* ------------------------------------------------------------------ */
   function uniqueSorted(key) {
     var seen = Object.create(null);
@@ -376,17 +492,24 @@
     }).map(function (k) { return { value: k, count: seen[k] }; });
   }
 
-  // Index de recherche pré-calculé : la recherche reste instantanée
-  // même avec plusieurs milliers de références.
   products.forEach(function (p) {
-    p._search = slugify([p.name, p.category, p.collection, p.matter, p.material, p.ref].join(" "));
+    p._search = slugify([p.name, p.brand, p.category, p.collection,
+                         p.matter, p.material, p.ref].join(" "));
   });
+
+  var COLLECTION_ORDER = ["Mobilier", "Luminaires", "Décoration",
+                          "Art de la table", "Extérieur", "Cadeaux"];
 
   var API = {
     all: products,
+    scenes: SCENES,
     categories: uniqueSorted("category"),
-    collections: uniqueSorted("collection"),
+    brands: uniqueSorted("brand"),
     matters: uniqueSorted("matter"),
+    collections: COLLECTION_ORDER.map(function (c) {
+      return { value: c, count: products.filter(function (p) { return p.collection === c; }).length };
+    }),
+    collectionOrder: COLLECTION_ORDER,
     priceBounds: products.reduce(function (acc, p) {
       return { min: Math.min(acc.min, p.price), max: Math.max(acc.max, p.price) };
     }, { min: Infinity, max: 0 }),
@@ -402,8 +525,8 @@
       return typeof limit === "number" ? list.slice(0, limit) : list;
     },
     featured: function (limit) {
-      var ids = ["fauteuil-oslo", "table-basse-alba", "canape-noma", "table-epure",
-                 "lampe-atelier", "console-elan", "fauteuil-arca", "table-riviera"];
+      var ids = ["chaise-luxembourg", "canape-nubes", "suspension-kila", "vase-terra",
+                 "table-bok", "bougie-flambeau", "fauteuil-nube", "brasero-ofyr-classic-85"];
       var list = ids.map(API.byId).filter(Boolean);
       return list.slice(0, limit || ids.length);
     },
