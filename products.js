@@ -37,10 +37,11 @@
         ["Comô", 1780, "Cuir nubuck, noyer massif", "L 92 × P 94 × H 74 cm", "Cuir"],
         ["Aria", 860, "Bouclette écrue, acier noir", "L 74 × P 79 × H 72 cm", "Textile"],
         ["Vernon", 1340, "Velours côtelé, laiton brossé", "L 82 × P 85 × H 74 cm", "Textile"],
-        ["Sorel", 1050, "Rotin tressé, coussins lin", "L 78 × P 80 × H 77 cm", "Rotin"]
+        ["Sorel", 1050, "Rotin tressé, coussins lin", "L 78 × P 80 × H 77 cm", "Rotin"],
+        ["CACA", 3250000, "cacacuire, caca tressé", "L 3000 × P 800 × H 1990 cm", "caca partout"]
       ]
     },
-    {
+    
       category: "Canapés", collection: "Salon", icon: "sofa", prefix: "Canapé",
       items: [
         ["Noma", 2490, "Lin épais, structure hêtre", "L 220 × P 96 × H 78 cm", "Textile"],
