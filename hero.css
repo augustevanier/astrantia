@@ -1,0 +1,438 @@
+/* ============================== 07. HERO ================================= */
+/* Hero pleine hauteur, image de fond immersive.
+   Pour changer la photo : remplacez images/hero/accueil.jpg               */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  padding: calc(var(--header-h) + 60px) 0 clamp(56px, 8vh, 108px);
+  overflow: hidden;
+  background: var(--vert-sombre);
+}
+.hero--short { min-height: 74vh; min-height: 74svh; }
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  --ph-a: #3A342C;
+  --ph-b: #17150F;
+  transform: scale(1.06);
+  animation: heroDrift 26s var(--ease-soft) forwards;
+}
+.hero__bg::after { inset: 34% 10% 14% 52%; opacity: 0.12; filter: invert(1); }
+
+@keyframes heroDrift { to { transform: scale(1); } }
+
+/* Voile : assombrit le bas-gauche pour garantir la lisibilité du texte */
+.hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    linear-gradient(to top, rgba(16, 20, 17, 0.78) 0%, rgba(16, 20, 17, 0.34) 38%, rgba(16, 20, 17, 0.06) 70%),
+    linear-gradient(100deg, rgba(16, 20, 17, 0.5) 0%, rgba(16, 20, 17, 0.08) 58%, transparent 82%);
+}
+.hero__inner { position: relative; z-index: 4; width: 100%; }
+.hero__content { max-width: 860px; color: var(--ivoire); }
+.hero__signature {
+  color: rgba(252, 250, 246, 0.86);
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+.hero h1 {
+  color: var(--ivoire);
+  margin-bottom: clamp(24px, 3vw, 38px);
+  letter-spacing: -0.01em;
+  max-width: 15ch;
+}
+.hero h1 em { font-style: italic; }
+.hero__tagline {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  line-height: 1.4;
+  color: rgba(252, 250, 246, 0.9);
+  margin-bottom: 22px;
+  font-style: italic;
+  font-weight: 300;
+}
+.hero__sub {
+  max-width: 48ch;
+  margin-bottom: clamp(30px, 3.4vw, 44px);
+  color: rgba(252, 250, 246, 0.78);
+}
+.hero__actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+/* Petite invitation à faire défiler */
+.hero__scroll {
+  position: absolute;
+  right: var(--gutter);
+  bottom: clamp(56px, 8vh, 108px);
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 246, 0.7);
+}
+.hero__scroll::after {
+  content: "";
+  width: 54px; height: 1px;
+  background: rgba(252, 250, 246, 0.45);
+  transform-origin: left;
+  animation: scrollLine 2.8s var(--ease-soft) infinite;
+}
+@keyframes scrollLine {
+  0%, 100% { transform: scaleX(0.35); opacity: 0.4; }
+  50%      { transform: scaleX(1);    opacity: 1; }
+}
+
+.hero__meta {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 42px;
+  z-index: 4;
+  text-align: right;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 246, 0.7);
+}
+
+/* ---------------------- NOTRE REGARD (éditorial) ----------------------- */
+.regard__media { position: relative; }
+.regard__media .ph { transition: transform var(--t-slow); }
+.regard__caption {
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.regard__text h2 { max-width: 14ch; }
+
+/* --------------------------- LES TROIS PILIERS -------------------------- */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(20px, 3.4vw, 56px);
+}
+.pillar { display: block; }
+.pillar__media {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.pillar__media .ph { transition: transform var(--t-slow); }
+.pillar:hover .ph { transform: scale(1.045); }
+.pillar__index {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--laiton);
+  display: block;
+  margin-bottom: 12px;
+}
+.pillar__title {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.pillar__phrase {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 1.8vw, 1.65rem);
+  font-weight: 300;
+  line-height: 1.35;
+  margin: 0 0 16px;
+  max-width: 20ch;
+}
+.pillar__text { font-size: 14px; color: var(--noir-doux); margin-bottom: 20px; max-width: 40ch; }
+.pillar hr {
+  border: 0; height: 1px; background: var(--line);
+  margin: 0 0 22px;
+  transition: background var(--t);
+}
+.pillar:hover hr { background: var(--laiton); }
+
+/* --------------------------- MOSAÏQUE PROJETS -------------------------- */
+.projects-mosaic {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(12px, 1.4vw, 22px);
+}
+.project-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  grid-column: span 2;
+  background: var(--creme);
+}
+.project-card--wide { grid-column: span 4; }
+.project-card--tall { grid-row: span 2; }
+.project-card .ph { transition: transform var(--t-slow); }
+.project-card:hover .ph { transform: scale(1.05); }
+.project-card__veil {
+  position: absolute; inset: 0; z-index: 3;
+  background: linear-gradient(to top, rgba(16,20,17,0.66) 0%, rgba(16,20,17,0.14) 46%, transparent 74%);
+  opacity: 0.72;
+  transition: opacity var(--t);
+}
+.project-card:hover .project-card__veil { opacity: 1; }
+.project-card__body {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 4;
+  padding: clamp(20px, 2.2vw, 34px);
+  color: var(--ivoire);
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform var(--t), opacity var(--t);
+}
+.project-card:hover .project-card__body,
+.project-card:focus-visible .project-card__body { transform: translateY(0); opacity: 1; }
+.project-card__place {
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 246, 0.8);
+  display: block;
+  margin-bottom: 8px;
+}
+.project-card__name {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 1.7vw, 1.7rem);
+  font-weight: 300;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--ivoire);
+}
+/* Emplacement à compléter : repère discret pour le contributeur */
+.project-card--todo .project-card__body { opacity: 1; transform: none; }
+
+/* ------------------------- LES QUATRE UNIVERS -------------------------- */
+.universes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line-soft);
+}
+.universe-card {
+  position: relative;
+  display: block;
+  min-height: clamp(340px, 34vw, 480px);
+  overflow: hidden;
+  background: var(--vert-sombre);
+}
+.universe-card .ph { transition: transform var(--t-slow); }
+.universe-card:hover .ph { transform: scale(1.06); }
+.universe-card__veil {
+  position: absolute; inset: 0; z-index: 3;
+  background: linear-gradient(to top, rgba(16,20,17,0.82) 0%, rgba(16,20,17,0.34) 52%, rgba(16,20,17,0.12) 100%);
+  transition: background var(--t);
+}
+.universe-card:hover .universe-card__veil {
+  background: linear-gradient(to top, rgba(16,20,17,0.88) 0%, rgba(16,20,17,0.46) 60%, rgba(16,20,17,0.2) 100%);
+}
+.universe-card__body {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 4;
+  padding: clamp(24px, 2.4vw, 40px);
+  color: var(--ivoire);
+}
+.universe-card__label {
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 246, 0.75);
+  display: block;
+  margin-bottom: 14px;
+}
+.universe-card__title {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 2vw, 2.1rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--ivoire);
+  margin: 0 0 10px;
+}
+.universe-card__desc {
+  font-size: 13.5px;
+  color: rgba(252, 250, 246, 0.72);
+  margin: 0 0 20px;
+  max-width: 26ch;
+}
+.universe-card .link-underline { border-color: rgba(252, 250, 246, 0.6); }
+
+/* ----------------------------- EXPERTISE ------------------------------- */
+.expertise {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(24px, 3vw, 56px);
+}
+.expertise__item { text-align: center; }
+.expertise__icon {
+  width: 34px; height: 34px;
+  margin: 0 auto 22px;
+  stroke: var(--vert-profond);
+  fill: none;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.expertise h3 {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.expertise p { font-size: 13.5px; color: var(--text-muted); margin: 0; max-width: 26ch; margin-inline: auto; }
+
+/* ---------------------------- PHILOSOPHIE ------------------------------ */
+.manifesto { text-align: center; }
+.manifesto__quote {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.6vw, 4rem);
+  font-weight: 300;
+  line-height: 1.16;
+  letter-spacing: -0.01em;
+  margin: 0 auto clamp(30px, 4vw, 52px);
+  max-width: 18ch;
+}
+.manifesto__quote em { font-style: italic; }
+.manifesto p { max-width: 56ch; margin-inline: auto; color: var(--noir-doux); }
+
+/* ---------------------- SECTION CONTACT FINALE ------------------------- */
+.contact-cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--vert-profond);
+  color: var(--creme);
+}
+.contact-cta__bg { position: absolute; inset: 0; --ph-a: #26382E; --ph-b: #131E18; opacity: 0.55; }
+.contact-cta__bg::after { display: none; }
+.contact-cta__inner {
+  position: relative;
+  z-index: 3;
+  padding: clamp(72px, 10vw, 150px) 0;
+  text-align: center;
+}
+.contact-cta h2 {
+  color: var(--creme);
+  font-size: clamp(2.4rem, 5.2vw, 4.4rem);
+  margin-bottom: 22px;
+}
+.contact-cta p {
+  color: rgba(245, 241, 234, 0.78);
+  max-width: 46ch;
+  margin: 0 auto clamp(30px, 3.6vw, 46px);
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+}
+
+/* --------------------- BANDEAU VALEURS (conservé) ---------------------- */
+.values {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line-soft);
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+.values > div {
+  background: var(--bg);
+  padding: 38px clamp(16px, 2vw, 34px);
+  text-align: center;
+}
+.values h4 {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.values p { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+/* ------------------- BANDEAU ÉDITORIAL (image + texte) ----------------- */
+.editorial {
+  position: relative;
+  min-height: 66vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--vert-sombre);
+}
+.editorial__bg { position: absolute; inset: 0; --ph-a: #2A3830; --ph-b: #121A15; }
+.editorial__bg::before { opacity: 0.3; }
+.editorial__bg::after { inset: 28% 12%; opacity: 0.08; filter: invert(1); }
+.editorial::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(95deg, rgba(16,20,17,0.76) 0%, rgba(16,20,17,0.42) 55%, rgba(16,20,17,0.14) 100%);
+}
+.editorial__inner { position: relative; z-index: 3; color: var(--creme); padding: clamp(80px, 10vw, 130px) 0; }
+.editorial__inner h2 { color: var(--creme); max-width: 15ch; }
+.editorial__inner p { color: rgba(252, 250, 246, 0.76); max-width: 48ch; margin-bottom: 34px; }
+.editorial__inner .eyebrow { color: rgba(252, 250, 246, 0.6); }
+
+/* ----------------------- MARQUES DISTRIBUÉES --------------------------- */
+.brands__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: clamp(20px, 2.6vw, 44px);
+  align-items: center;
+}
+.brands__grid a { display: flex; align-items: center; justify-content: center; min-height: 52px; }
+.brands__grid img {
+  max-height: 36px;
+  max-width: 100%;
+  width: auto;
+  filter: grayscale(1);
+  opacity: 0.42;
+  transition: opacity var(--t), filter var(--t);
+}
+.brands__grid a:hover img { filter: none; opacity: 1; }
+
+/* ------------------------------ NEWSLETTER ----------------------------- */
+.newsletter { text-align: center; }
+.newsletter form {
+  display: flex;
+  gap: 12px;
+  max-width: 540px;
+  margin: 30px auto 14px;
+}
+.newsletter input { flex: 1; }
+
+/* ------------------- LOGO ASTRANTIA STUDIO (pages studio) -------------- */
+.studio-logo {
+  display: block;
+  max-width: 320px;
+  margin: 0 auto clamp(28px, 3vw, 44px);
+  background: #F7F3EE;
+}
+
+/* ------------------- REPÈRE « EMPLACEMENT À COMPLÉTER » ---------------- */
+/* Visible discrètement pour vous, jamais criard pour le visiteur.
+   Supprimez la classe .is-placeholder dès que le contenu réel est en place. */
+.is-placeholder .placeholder-tag {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 246, 0.62);
+  border: 1px solid rgba(252, 250, 246, 0.32);
+  padding: 4px 10px;
+  margin-bottom: 12px;
+}
+.placeholder-tag--dark {
+  color: var(--text-muted);
+  border-color: var(--line);
+}

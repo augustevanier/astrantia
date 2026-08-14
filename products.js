@@ -73,17 +73,57 @@
     return U + list[i % list.length] + OPT;
   }
 
-  // Visuels d'ambiance utilisés dans les pages (hero, univers, showroom)
+  /* Visuels d'ambiance utilisés dans les pages (hero, piliers, projets,
+     univers, showroom).
+
+     COMMENT METTRE VOS PROPRES PHOTOS :
+     chaque visuel est déclaré en HTML avec deux attributs :
+       data-scene="hero"                      → la clé ci-dessous
+       data-local="images/hero/accueil.jpg"   → VOTRE fichier
+     Déposez simplement le fichier au chemin indiqué dans data-local :
+     il remplace automatiquement la photo de démonstration. Aucun code
+     à modifier. Les photos ci-dessous ne servent qu'à la maquette.       */
   var SCENES = {
-    hero:       photo("interior", 0),
-    showroom:   photo("interior", 3),
-    atelier:    photo("interior", 4),
-    mobilier:   photo("seating", 3),
-    luminaires: photo("lamps", 1),
-    decoration: photo("decor", 0),
-    table:      photo("decor", 3),
-    exterieur:  photo("outdoor", 1),
-    cadeaux:    photo("decor", 4)
+    /* Accueil & pages éditoriales */
+    hero:               photo("interior", 0),
+    regard:             photo("interior", 1),
+    showroom:           photo("interior", 3),
+    maison:             photo("interior", 2),
+    contact:            photo("interior", 4),
+
+    /* Les trois piliers */
+    "pilier-vision":    photo("interior", 1),
+    "pilier-confiance": photo("decor", 1),
+    "pilier-evidence":  photo("tables", 2),
+
+    /* Les quatre univers */
+    studio:             photo("interior", 3),
+    collection:         photo("seating", 1),
+    atelier:            photo("interior", 4),
+    "art-de-vivre":     photo("decor", 2),
+
+    /* Atelier — détails */
+    "atelier-1":        photo("tables", 4),
+    "atelier-2":        photo("tables", 1),
+    "atelier-3":        photo("decor", 5),
+
+    /* Projets (emplacements à compléter : images/projets/projet-N.jpg) */
+    "projet-1":         photo("interior", 0),
+    "projet-2":         photo("decor", 3),
+    "projet-3":         photo("tables", 0),
+    "projet-4":         photo("seating", 5),
+    "projet-5":         photo("seating", 2),
+    "projet-6":         photo("outdoor", 0),
+    "projet-7":         photo("lamps", 3),
+    "projet-8":         photo("interior", 2),
+
+    /* Univers de la collection */
+    mobilier:           photo("seating", 3),
+    luminaires:         photo("lamps", 1),
+    decoration:         photo("decor", 0),
+    table:              photo("decor", 3),
+    exterieur:          photo("outdoor", 1),
+    cadeaux:            photo("decor", 4)
   };
 
   /* ------------------------------------------------------------------ */

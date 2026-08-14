@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ASTRANTIA — Logique du site
+   MAISON ASTRANTIA — Logique du site
    Vanilla JS, sans dépendance. Chargé après js/products.js.
    Sommaire :
    A. Utilitaires
@@ -113,13 +113,13 @@ window.ASTRANTIA_IMG = {
     });
   }
 
-  /* Logo : images/logo.png → logo du site actuel → logo texte */
+  /* Logo : si vous déposez images/logo.png, il remplace automatiquement le
+     logotype typographique « MAISON ASTRANTIA ». Sinon, le texte reste. */
   function initLogos() {
     qsa(".logo[data-logo]").forEach(function (el) {
       el.insertAdjacentHTML("afterbegin",
         '<img class="logo__img" src="images/logo.png"' +
-        ' data-fb="https://astrantia.fr/wp-content/themes/idcomweb/img/logo.png"' +
-        ' alt="Astrantia — décoration, mobilier & cadeaux"' +
+        ' alt="Maison Astrantia"' +
         ' onload="ASTRANTIA_IMG.ok(this)" onerror="ASTRANTIA_IMG.err(this)">');
     });
   }
@@ -259,26 +259,43 @@ window.ASTRANTIA_IMG = {
     var searchToggle = qs("#searchToggle");
     var searchPanel = qs("#searchPanel");
 
+    /* Header : transparent tant que le hero est visible derrière lui,
+       puis fond ivoire dès que l'on quitte l'image.                     */
+    var hero = qs(".hero");
+    var navOpen = false;
+
     if (header) {
       var onScroll = function () {
-        header.classList.toggle("is-scrolled", window.scrollY > 12);
+        var y = window.scrollY || window.pageYOffset;
+        header.classList.toggle("is-scrolled", y > 12);
+        if (hero) {
+          var limit = hero.offsetHeight - header.offsetHeight - 8;
+          header.classList.toggle("is-over", !navOpen && y < limit);
+        }
       };
       onScroll();
       window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      header.__onScroll = onScroll;
     }
 
     if (burger && nav) {
       burger.addEventListener("click", function () {
         var open = nav.classList.toggle("is-open");
+        navOpen = open;
         burger.classList.toggle("is-open", open);
         burger.setAttribute("aria-expanded", open ? "true" : "false");
         document.body.classList.toggle("is-locked", open);
+        if (header && header.__onScroll) header.__onScroll();
       });
       qsa("a", nav).forEach(function (a) {
         a.addEventListener("click", function () {
           nav.classList.remove("is-open");
+          navOpen = false;
           burger.classList.remove("is-open");
+          burger.setAttribute("aria-expanded", "false");
           document.body.classList.remove("is-locked");
+          if (header && header.__onScroll) header.__onScroll();
         });
       });
     }
@@ -301,11 +318,19 @@ window.ASTRANTIA_IMG = {
       });
     }
 
+    /* État actif de la navigation.
+       Les pages boutique / produit / panier n'ont pas d'entrée propre :
+       elles éclairent l'entrée « Collection ».                          */
     var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+    var ALIASES = {
+      "boutique.html": "collections.html",
+      "produit.html": "collections.html",
+      "panier.html": "collections.html"
+    };
+    var active = ALIASES[here] || here;
     qsa(".main-nav a").forEach(function (a) {
-      var target = a.getAttribute("href").split("?")[0].toLowerCase();
-      if (target === here) a.classList.add("is-active");
-      if (here === "produit.html" && target === "boutique.html") a.classList.add("is-active");
+      var target = a.getAttribute("href").split("?")[0].split("#")[0].toLowerCase();
+      if (target === active) a.classList.add("is-active");
     });
   }
 
@@ -643,7 +668,7 @@ window.ASTRANTIA_IMG = {
       return;
     }
 
-    document.title = p.name + " — " + p.brand + " | Astrantia";
+    document.title = p.name + " — " + p.brand + " | Maison Astrantia";
     var meta = qs('meta[name="description"]');
     if (meta) meta.setAttribute("content", p.name + " (" + p.brand + ") — " + p.description.slice(0, 140));
 
@@ -818,7 +843,7 @@ window.ASTRANTIA_IMG = {
         contentEl.hidden = false;
         contentEl.innerHTML = '<div class="alert alert--ok" style="margin:0"><strong>Commande simulée avec succès.</strong>' +
           "<br>Montant : " + price(t.total) + ". Ce site est une démonstration : aucun paiement n'est traité " +
-          "et aucune donnée n'est transmise. En conditions réelles, Astrantia vous recontacterait sous 24 h ouvrées." +
+          "et aucune donnée n'est transmise. En conditions réelles, Maison Astrantia vous recontacterait sous 24 h ouvrées." +
           '<p style="margin:16px 0 0"><a class="btn btn--sm" href="boutique.html">Poursuivre mes achats</a></p></div>';
       });
     }
@@ -891,7 +916,7 @@ window.ASTRANTIA_IMG = {
       form.innerHTML = '<div class="alert alert--ok"><strong>Merci ' + esc(prenom) +
         ", votre message a bien été transmis.</strong><br>Nous vous répondons sous 24 heures ouvrées. " +
         "Ce site étant une démonstration sans serveur, aucune donnée n'est réellement envoyée ni conservée.</div>" +
-        '<a class="btn" href="boutique.html">Découvrir la boutique</a>';
+        '<a class="btn" href="collections.html">Découvrir la collection</a>';
     });
   }
 
@@ -903,7 +928,7 @@ window.ASTRANTIA_IMG = {
         var v = (input.value || "").trim();
         if (!EMAIL_RE.test(v)) { toast("Merci de saisir une adresse e-mail valide."); input.focus(); return; }
         form.innerHTML = '<p style="margin:0">Merci — votre inscription est enregistrée. ' +
-          "Vous recevrez nos nouveautés et nos invitations aux ateliers.</p>";
+          "Vous recevrez nos nouveautés, nos projets et nos rendez-vous.</p>";
       });
     });
   }

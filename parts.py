@@ -1,36 +1,26 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panier | Maison Astrantia</title>
-<meta name="description" content="Votre panier Maison Astrantia : récapitulatif, quantités, code promotionnel, retrait gratuit sur place à Attignat ou livraison.">
-<meta name="theme-color" content="#FCFAF6">
-<link rel="canonical" href="https://astrantia.fr/panier.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Maison Astrantia">
-<meta property="og:title" content="Panier | Maison Astrantia">
-<meta property="og:description" content="Votre panier Maison Astrantia : récapitulatif, quantités, code promotionnel, retrait gratuit sur place à Attignat ou livraison.">
-<meta property="og:url" content="https://astrantia.fr/panier.html">
-<meta property="og:locale" content="fr_FR">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231E3229'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='17' fill='%23FCFAF6' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
-<link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/jost-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+# -*- coding: utf-8 -*-
+"""Fragments partagés (header, footer, <head>) — Maison Astrantia.
 
-<!-- ============================ HEADER ============================ -->
-<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
-     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
-<!-- ============================ HEADER ============================ -->
-<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
-     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
-<!-- ============================ HEADER ============================ -->
-<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
-     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
-<!-- ============================ HEADER ============================ -->
+Ce fichier n'est PAS publié : il sert uniquement à régénérer les pages
+avec un header et un footer strictement identiques partout.
+Lancer :  python3 _build/build.py
+"""
+
+# --------------------------------------------------------------------------
+# Liens <head> communs : polices + feuille de style
+# --------------------------------------------------------------------------
+HEAD_LINKS = """<link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jost-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">"""
+
+FAVICON = ("""<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' """
+           """viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231E3229'/%3E%3Ctext x='16' y='22' """
+           """font-family='Georgia,serif' font-size='17' fill='%23FCFAF6' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">""")
+
+# --------------------------------------------------------------------------
+# HEADER — identique sur toutes les pages
+# --------------------------------------------------------------------------
+HEADER = """<!-- ============================ HEADER ============================ -->
 <!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
      ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
 <header class="site-header" id="siteHeader">
@@ -71,68 +61,12 @@
       <button type="button" class="search-close" id="searchClose">Fermer</button>
     </form>
   </div>
-</header>
+</header>"""
 
-<main>
-<section class="page-head">
-  <div class="container">
-    <p class="breadcrumb"><a href="index.html">Accueil</a><span>/</span>Panier</p>
-    <h1>Votre panier</h1>
-    <p class="lead muted">Retrait gratuit à la boutique d'Attignat, ou livraison offerte à partir de 500 € d'achat.</p>
-  </div>
-</section>
-
-<div id="cartPage" class="container">
-
-  <div id="cartEmpty" hidden>
-    <div class="empty-state" style="margin:clamp(40px,6vw,80px) 0">
-      <h3>Votre panier est vide</h3>
-      <p class="muted">Parcourez la boutique — mobilier, luminaires, décoration, art de la table, extérieur et cadeaux vous y attendent.</p>
-      <p style="margin-top:22px"><a class="btn btn--solid" href="boutique.html">Explorer la boutique</a></p>
-    </div>
-  </div>
-
-  <div id="cartContent" hidden>
-    <div class="cart-layout">
-      <div>
-        <div id="cartLines"></div>
-        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;align-items:center">
-          <a class="link-underline" href="boutique.html">Poursuivre mes achats</a>
-          <button type="button" class="filter-reset" id="cartClear">Vider le panier</button>
-        </div>
-      </div>
-
-      <aside class="cart-summary">
-        <h2>Récapitulatif</h2>
-        <div id="cartSummary"></div>
-
-        <form class="promo-form" id="promoForm" novalidate>
-          <input type="text" placeholder="Code promotionnel" aria-label="Code promotionnel">
-          <button type="submit" class="btn btn--sm">Appliquer</button>
-        </form>
-        <p class="muted" style="font-size:12px;margin:0 0 22px">Codes de démonstration : <strong>ASTRANTIA10</strong> (−10 %) ou <strong>BIENVENUE5</strong> (−5 %).</p>
-
-        <button type="button" class="btn btn--solid btn--full" id="checkoutBtn">Valider la commande</button>
-        <p class="form-note" style="margin-top:14px">Paiement simulé · Aucun prélèvement réel n'est effectué sur cette maquette. Pour commander réellement, appelez-nous au 06 28 54 66 11.</p>
-      </aside>
-    </div>
-  </div>
-
-  <section class="section">
-    <div class="section-head">
-      <div class="section-head__text reveal">
-        <span class="eyebrow">Vous aimerez aussi</span>
-        <h2>Nos coups de cœur</h2>
-      </div>
-      <a class="link-underline reveal" href="boutique.html">Toute la boutique</a>
-    </div>
-    <div class="product-grid" id="cartSuggestions"></div>
-  </section>
-
-</div>
-</main>
-
-<!-- ============================ FOOTER ============================ -->
+# --------------------------------------------------------------------------
+# FOOTER — identique sur toutes les pages
+# --------------------------------------------------------------------------
+FOOTER = """<!-- ============================ FOOTER ============================ -->
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -201,9 +135,21 @@
       </ul>
     </div>
   </div>
-</footer>
+</footer>"""
 
-<script src="products.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+SCRIPTS = """<script src="products.js"></script>
+<script src="script.js"></script>"""
+
+# --------------------------------------------------------------------------
+# Bloc contact final — réutilisé en bas de plusieurs pages
+# --------------------------------------------------------------------------
+CONTACT_CTA = """<!-- ===================== PARLONS DE VOTRE PROJET ==================== -->
+<section class="contact-cta">
+  <span class="ph contact-cta__bg" data-tone="7" data-scene="contact" data-local="images/showroom/contact.jpg" data-alt="" aria-hidden="true"></span>
+  <div class="container contact-cta__inner">
+    <span class="eyebrow reveal">Contact</span>
+    <h2 class="reveal" data-delay="1">Parlons de votre projet.</h2>
+    <p class="reveal" data-delay="2">Une maison à transformer, un lieu à imaginer, une idée à faire naître&nbsp;? Échangeons.</p>
+    <div class="reveal" data-delay="3"><a class="btn btn--light" href="contact.html">Prendre contact</a></div>
+  </div>
+</section>"""

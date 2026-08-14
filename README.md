@@ -1,70 +1,106 @@
-# Astrantia — site e-commerce
+# Maison Astrantia
 
-Maquette complète du site d'Astrantia — décoration, mobilier & cadeaux, 40c allée des négociants, 01340 Attignat.
-HTML5 + CSS3 + JavaScript vanilla. **Aucune dépendance, aucun build** : ouvrez `index.html` et tout fonctionne.
+Site de **Maison Astrantia** — maison de conception, d'aménagement, de mobilier et d'art de vivre.
+40c allée des négociants, 01340 Attignat.
+
+**Signature : Vision · Confiance · Évidence.**
+
+HTML5 + CSS3 + JavaScript vanilla. **Aucune dépendance, aucun outil de build obligatoire** :
+ouvrez `index.html` et tout fonctionne.
+
+---
+
+## Le positionnement
+
+Le site raconte, dans cet ordre : **émotion → vision → confiance → projets → expertise → univers → contact**.
+La boutique et les produits restent complets et fonctionnels, mais ils arrivent *après* la
+compréhension de qui est Astrantia et de ce qu'elle sait faire.
 
 ## Structure
 
 ```
 astrantia/
-├── index.html          Accueil : hero, univers, sélection, marques, services, boutique
-├── boutique.html       Catalogue : recherche, filtres (univers/catégorie/marque/matière/prix), tri
+├── index.html          Accueil : hero, notre regard, 3 piliers, projets, 4 univers,
+│                       studio, sélection du moment, partagez et adoptez, expertise,
+│                       philosophie, marques, la maison, newsletter, contact
+├── projets.html        PROJETS — la mosaïque des réalisations (emplacements à compléter)
+├── studio.html         STUDIO — projets & conception, les 3 piliers développés, la méthode
+├── collections.html    COLLECTION — les 6 univers de la sélection, en pages éditoriales
+├── atelier.html        ATELIER — créations sur mesure
+├── art-de-vivre.html   ART DE VIVRE — matières, objets & inspirations
+├── a-propos.html       LA MAISON — qui nous sommes, engagements, visite, mentions légales
+├── contact.html        « Parlons de votre projet » — formulaire validé + coordonnées
+├── boutique.html       Catalogue : recherche, filtres, tri, pagination
 ├── produit.html        Fiche dynamique — produit.html?id=chaise-luxembourg
-├── collections.html    Les six univers, en pages éditoriales
-├── a-propos.html       La maison, l'accompagnement, l'éthique, mentions légales
-├── contact.html        Formulaire validé + coordonnées réelles
-├── panier.html         Panier, code promo, retrait boutique, commande simulée
+├── panier.html         Panier, code promo, retrait sur place, commande simulée
+├── style.css           Toute la direction artistique (commentée, section par section)
+├── products.js         LE CATALOGUE — produits, marques, univers, photos de démo
+├── script.js           Toute la logique + le système d'images
+├── fonts/              Polices auto-hébergées (woff2, sous-ensemble latin)
+├── images/             hero/ piliers/ projets/ univers/ atelier/ collections/
+│                       showroom/ produits/ logo/   → voir images/LISEZ-MOI.txt
 ├── robots.txt / sitemap.xml
-├── css/style.css       Design system complet (1 230 lignes, commenté)
-├── js/products.js      LE CATALOGUE — 130 produits, 31 marques
-├── js/script.js        Toute la logique + le système d'images
-└── images/             hero/ produits/ collections/ showroom/ + logo.png
+└── _build/             (optionnel) gabarits de génération — voir plus bas
 ```
 
 ## Vos photos s'affichent toutes seules
 
 Chaque visuel tente de charger, dans l'ordre :
 
-1. **votre photo** — `images/produits/<identifiant>.jpg`
-2. la photo de démonstration (banque libre de droit, déjà en place)
-3. le visuel CSS de secours
+1. **votre photo** — le chemin est écrit dans l'attribut `data-local` du HTML
+   (ex. `images/hero/accueil.jpg`, `images/projets/projet-1.jpg`) ;
+2. la photo de démonstration (banque libre de droit, déjà en place) ;
+3. le visuel CSS de secours (dégradé de matière + pictogramme).
 
-Autrement dit : **déposez `images/produits/chaise-luxembourg.jpg` et la photo apparaît partout** — grille, fiche produit, panier, produits similaires. Aucun code à toucher, aucune liste à tenir à jour.
+**Vous n'avez donc jamais de code à toucher pour changer une image** : déposez le fichier
+au bon endroit, il remplace automatiquement la démo. La liste complète des emplacements
+est dans `images/LISEZ-MOI.txt`.
 
-- Vues supplémentaires d'une fiche : `<identifiant>-2.jpg`, `-3.jpg`, `-4.jpg`
-- Ambiances : `images/hero/accueil.jpg`, `images/collections/mobilier.jpg`, `images/showroom/boutique.jpg`…
-- Logo : `images/logo.png` (à défaut, le logo actuel d'astrantia.fr est utilisé, puis le logo texte)
+Pour un produit : `images/produits/<identifiant>.jpg` (+ `-2.jpg`, `-3.jpg`, `-4.jpg`
+pour les vues supplémentaires de la fiche).
 
-L'identifiant d'un produit est son nom en minuscules, sans accent, mots reliés par des tirets. Il est visible dans l'URL de sa fiche.
+## Le logo
 
-## Le catalogue
+Le logotype affiché dans le header et le footer est **typographique** (« MAISON ASTRANTIA »),
+donc net à toutes les tailles. Si vous déposez un fichier `images/logo.png`, il le remplace
+automatiquement partout.
 
-Tout part de `js/products.js`. Un produit = une ligne :
+Le logo **Astrantia Studio** fourni est dans `images/logo/astrantia-studio.png` (fond rendu
+transparent, proportions d'origine respectées). Il est utilisé tel quel sur la page Studio.
 
-```js
-["Modèle", 189, "Fermob", "Aluminium laqué", "L 52 × P 56 × H 88 cm", "Métal"]
-```
+## Emplacements à compléter
 
-Identifiant, référence, description, coloris, photo et présence dans les filtres sont générés automatiquement. Les filtres de la boutique (6 univers, 19 catégories, 31 marques, 8 familles de matière) se construisent à partir des données : ajouter une marque suffit à créer sa case.
+Les contenus que nous n'avions pas sont signalés dans le code par le commentaire
+`EMPLACEMENT À COMPLÉTER` et à l'écran par une petite étiquette discrète :
 
-## Fonctionnalités
+- **les 8 projets** (`projets.html` et l'accueil) : photo, lieu, nom ;
+- **l'histoire de la maison** (`a-propos.html`) ;
+- **les mentions légales** : forme juridique, capital, directeur de la publication.
 
-- Recherche multi-termes insensible aux accents (nom, marque, catégorie, matière, référence)
-- Filtres cumulables avec compteurs et étiquettes supprimables · 6 tris dont « par marque »
-- URL partageable : `boutique.html?marque=Fermob&collection=Extérieur&tri=prix-asc`
-- Panier persistant, codes `ASTRANTIA10` / `BIENVENUE5`, livraison offerte dès 500 €, retrait gratuit en boutique
-- Fiches produits dynamiques, galerie 4 vues, pièces assorties
-- Bandeau des marques distribuées (logos repris d'astrantia.fr)
-- SEO complet, responsive mobile/tablette/desktop, accessibilité clavier et ARIA
+Pour publier un projet : déposez `images/projets/projet-N.jpg`, remplacez le lieu et le nom,
+puis supprimez les classes `project-card--todo` et `is-placeholder` ainsi que la ligne
+`<span class="placeholder-tag">…</span>`.
 
-## Avant la mise en ligne
+Aucune information n'a été inventée : ni avis client, ni chiffre, ni date, ni nom.
 
-- Remplacer les photos de démonstration par les visuels de la boutique
-- Ajouter `images/logo.png`
-- Vérifier les horaires exacts et compléter les mentions légales si besoin
-- Le formulaire de contact et la newsletter sont simulés : les brancher sur un service type Formspree ou Brevo
-- Le paiement est simulé : brancher Stripe ou PayPal pour vendre réellement
+## Personnaliser le design
 
-## Vérifications effectuées
+Tout se règle dans `style.css` :
 
-0 lien mort · 130 produits sans doublon d'identifiant · structure HTML équilibrée sur les 7 pages · CSS et JS sans erreur de syntaxe · parcours testés automatiquement (recherche, filtres, tri, pagination, panier, promo, commande, validation du formulaire) · cascade d'images testée aux trois niveaux.
+- **couleurs** → bloc `01. VARIABLES` (ivoire, crème, sable, taupe, bois, vert profond, laiton) ;
+- **polices** → bloc `00. POLICES` (fichiers dans `/fonts`) + variables `--serif` / `--sans` ;
+- **rythme** → `--container`, `--gutter`, `--section-y`.
+
+Les polices sont **auto-hébergées** : aucun appel à Google Fonts, chargement plus rapide et
+conforme au RGPD.
+
+## Le dossier `_build/` (facultatif)
+
+Il contient les gabarits qui ont servi à générer les pages, afin que le header et le footer
+soient rigoureusement identiques partout. Il n'est **pas publié** (GitHub Pages ignore les
+dossiers commençant par `_`) et n'est **pas nécessaire** au fonctionnement du site.
+
+- Si vous modifiez directement les fichiers `.html`, ne relancez pas le script :
+  les `.html` sont la source publiée.
+- Si vous voulez changer le menu ou le footer sur **toutes** les pages d'un coup :
+  éditez `_build/parts.py` puis lancez `python3 _build/build.py`.

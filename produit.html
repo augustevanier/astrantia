@@ -3,34 +3,55 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fiche produit | Astrantia</title>
-<meta name="description" content="Fiche détaillée d'une pièce sélectionnée par Astrantia : marque, matières, dimensions, coloris, disponibilité en boutique à Attignat et pièces assorties.">
-<meta name="theme-color" content="#FBF9F5">
+<title>Fiche produit | Maison Astrantia</title>
+<meta name="description" content="Fiche détaillée d'une pièce sélectionnée par Maison Astrantia : marque, matières, dimensions, coloris et pièces assorties.">
+<meta name="theme-color" content="#FCFAF6">
 <link rel="canonical" href="https://astrantia.fr/produit.html">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Astrantia">
-<meta property="og:title" content="Fiche produit | Astrantia">
-<meta property="og:description" content="Fiche détaillée d'une pièce sélectionnée par Astrantia : marque, matières, dimensions, coloris, disponibilité en boutique à Attignat et pièces assorties.">
+<meta property="og:site_name" content="Maison Astrantia">
+<meta property="og:title" content="Fiche produit | Maison Astrantia">
+<meta property="og:description" content="Fiche détaillée d'une pièce sélectionnée par Maison Astrantia : marque, matières, dimensions, coloris et pièces assorties.">
 <meta property="og:url" content="https://astrantia.fr/produit.html">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231E1D1B'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='18' fill='%23FBF9F5' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231E3229'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='17' fill='%23FCFAF6' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jost-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <!-- ============================ HEADER ============================ -->
-<header class="site-header">
+<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
+     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
+<!-- ============================ HEADER ============================ -->
+<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
+     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
+<!-- ============================ HEADER ============================ -->
+<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
+     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
+<!-- ============================ HEADER ============================ -->
+<!-- Navigation unique à toutes les pages. Pour ajouter une entrée :
+     ajoutez simplement un <a> dans .main-nav ci-dessous.               -->
+<header class="site-header" id="siteHeader">
   <div class="container header-inner">
-    <a class="logo" href="index.html" data-logo><span class="logo__text">Astrantia</span></a>
+    <a class="logo" href="index.html" data-logo aria-label="Maison Astrantia — retour à l'accueil">
+      <span class="logo__text">
+        <span class="logo__maison">Maison</span>
+        <span class="logo__name">Astrantia</span>
+      </span>
+    </a>
     <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
-      <a href="index.html">Accueil</a>
-      <a href="boutique.html">Boutique</a>
-      <a href="collections.html">Nos univers</a>
+      <a href="projets.html">Projets</a>
+      <a href="studio.html">Studio</a>
+      <a href="collections.html">Collection</a>
+      <a href="atelier.html">Atelier</a>
+      <a href="art-de-vivre.html">Art de vivre</a>
       <a href="a-propos.html">La maison</a>
       <a href="contact.html">Contact</a>
     </nav>
     <div class="header-actions">
+      <span class="lang" aria-label="Langue du site : français">FR</span>
       <button type="button" class="icon-btn" id="searchToggle" aria-label="Rechercher" aria-expanded="false">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
       </button>
@@ -148,9 +169,15 @@
   <div class="container">
     <div class="footer-grid">
       <div>
-        <a class="logo" href="index.html" data-logo><span class="logo__text">Astrantia</span></a>
-        <p class="footer-about">Décoration, mobilier &amp; cadeaux. Une boutique à Attignat (01) où se mêlent design et décoration de grands noms, créateurs, designers locaux et artisanat français.</p>
-        <p class="footer-about" style="margin-top:14px">
+        <a class="logo" href="index.html" data-logo aria-label="Maison Astrantia">
+          <span class="logo__text">
+            <span class="logo__maison">Maison</span>
+            <span class="logo__name">Astrantia</span>
+          </span>
+        </a>
+        <p class="footer-signature">Vision · Confiance · Évidence</p>
+        <p class="footer-about">Maison de conception, d'aménagement, de mobilier et d'art de vivre. Nous imaginons, dessinons et révélons des lieux de vie singuliers.</p>
+        <p class="footer-about" style="margin-top:16px">
           40c allée des négociants<br>01340 Attignat<br>
           <a href="tel:+33628546611">06 28 54 66 11</a><br>
           <a href="mailto:contact@astrantia.fr">contact@astrantia.fr</a>
@@ -162,18 +189,19 @@
         </div>
       </div>
       <div>
-        <h4>Navigation</h4>
+        <h4>La maison</h4>
         <ul>
-          <li><a href="index.html">Accueil</a></li>
-          <li><a href="boutique.html">Boutique</a></li>
-          <li><a href="collections.html">Nos univers</a></li>
-          <li><a href="a-propos.html">La maison</a></li>
+          <li><a href="projets.html">Projets</a></li>
+          <li><a href="studio.html">Studio</a></li>
+          <li><a href="collections.html">Collection</a></li>
+          <li><a href="atelier.html">Atelier</a></li>
+          <li><a href="art-de-vivre.html">Art de vivre</a></li>
+          <li><a href="a-propos.html">Notre histoire</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li><a href="panier.html">Panier</a></li>
         </ul>
       </div>
       <div>
-        <h4>Nos univers</h4>
+        <h4>La sélection</h4>
         <ul>
           <li><a href="boutique.html?collection=Mobilier">Mobilier</a></li>
           <li><a href="boutique.html?collection=Luminaires">Luminaires</a></li>
@@ -181,25 +209,26 @@
           <li><a href="boutique.html?collection=Art%20de%20la%20table">Art de la table</a></li>
           <li><a href="boutique.html?collection=Ext%C3%A9rieur">Extérieur</a></li>
           <li><a href="boutique.html?collection=Cadeaux">Cadeaux</a></li>
+          <li><a href="boutique.html">Toute la sélection</a></li>
         </ul>
       </div>
       <div>
-        <h4>Services</h4>
+        <h4>Nous accompagner</h4>
         <ul>
-          <li><a href="contact.html">Accompagnement déco</a></li>
-          <li><a href="contact.html">Étude d'aménagement</a></li>
-          <li><a href="contact.html">Listes de mariage</a></li>
-          <li><a href="contact.html">Livraison &amp; installation</a></li>
-          <li><a href="a-propos.html">Notre éthique</a></li>
-          <li><a href="a-propos.html">Mentions légales</a></li>
+          <li><a href="studio.html">Conception &amp; aménagement</a></li>
+          <li><a href="atelier.html">Mobilier sur mesure</a></li>
+          <li><a href="studio.html#methode">Suivi de chantier</a></li>
+          <li><a href="contact.html">Parlons de votre projet</a></li>
+          <li><a href="panier.html">Panier</a></li>
+          <li><a href="a-propos.html#mentions">Mentions légales</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© <span data-year>2026</span> Astrantia — SIRET 849 412 309 00015. Maquette de démonstration.</p>
+      <p>© <span data-year>2026</span> Maison Astrantia — SIRET 849 412 309 00015. Maquette de démonstration.</p>
       <ul>
-        <li><a href="a-propos.html">Mentions légales</a></li>
-        <li><a href="a-propos.html">Confidentialité</a></li>
+        <li><a href="a-propos.html#mentions">Mentions légales</a></li>
+        <li><a href="a-propos.html#mentions">Confidentialité</a></li>
         <li><a href="contact.html">Aide</a></li>
       </ul>
     </div>
